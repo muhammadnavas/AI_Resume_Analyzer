@@ -80,7 +80,7 @@ To use this project, follow these steps:
 
 **Intelligent Chunk Selection in RAG and LLM:**
 - The application retrieves relevant text by comparing the user query with stored vector embeddings and selecting the Top K documents based on their similarity scores. This ensures that only the most relevant information is considered for further processing.
-- Once the most relevant documents are selected, the system initializes a Large Language Model (LLM), specifically the ChatGPT 3.5 Turbo model with OpenAI API key to analyze and generate responses based on the retrieved content.
+- Once the most relevant documents are selected, the system initializes a Large Language Model (LLM), specifically the ChatGPT 3.5 Turbo model to analyze and generate responses based on the retrieved content.
 
 **Robust Question-Answering Pipeline:**
 - The QA pipeline processes the Top K documents and the user query to generate meaningful responses. The system extracts relevant information from the retrieved content, ensuring accuracy and coherence.
