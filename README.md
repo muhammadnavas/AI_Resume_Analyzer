@@ -2,7 +2,7 @@
 
 **Introduction**
 
-Developed an advanced AI application that utilizes LLM and OpenAI for comprehensive resume analysis. It excels at summarizing the resume, evaluating strengths, identifying weaknesses, and offering personalized improvement suggestions, while also recommending the perfect job titles. Additionally, it seamlessly employs Selenium to extract vital LinkedIn data, encompassing company names, job titles, locations, job URLs, and detailed job descriptions. This application simplifies the job-seeking journey by equipping users with comprehensive insights to elevate their career opportunities.
+Developed an advanced AI application that leverages Retrieval-Augmented Generation (RAG), Large Language Models (LLM), and OpenAI for comprehensive resume analysis. It excels at summarizing the resume, evaluating strengths, identifying weaknesses, and offering personalized improvement suggestions while also recommending the perfect job titles. Additionally, it seamlessly employs Selenium to extract vital LinkedIn data, including company names, job titles, locations, job URLs, and detailed job descriptions. This application simplifies the job-seeking journey by equipping users with comprehensive insights to elevate their career opportunities.
 
 <br />
 
@@ -23,12 +23,13 @@ Developed an advanced AI application that utilizes LLM and OpenAI for comprehens
 - NumPy
 - Pandas
 - LangChain
-- LLM
+- Large Language Model (LLM)
+- Retrieval-Augmented Generation (RAG)
 - OpenAI
 - Selenium
-- Streamlit
-- Hugging Face
 - AWS
+- Hugging Face
+- Streamlit
 
 <br />
 
@@ -77,13 +78,13 @@ To use this project, follow these steps:
 - Seamlessly connecting to OpenAI services, the application establishes a secure connection using your OpenAI API key. This integration forms the basis for robust interactions, facilitating advanced analysis and efficient information retrieval.
 - It uses the FAISS(Facebook AI Similarity Search) library to convert both the text chunks and query text data into numerical vectors, simplifying the analysis process and enabling the retrieval of pertinent information.
 
-**Intelligent Chunk Selection and LLM:**
-- Utilizing similarity search, Resume Analyzer AI compares the query and chunks, enabling the selection of the top 'K' most similar chunks based on their similarity scores.
-- Simultaneously, the application creates an OpenAI object, particularly an LLM (Large Language Model), using the ChatGPT 3.5 Turbo model and your OpenAI API key.
+**Intelligent Chunk Selection in RAG and LLM:**
+- The application retrieves relevant text by comparing the user query with stored vector embeddings and selecting the Top K documents based on their similarity scores. This ensures that only the most relevant information is considered for further processing.
+- Once the most relevant documents are selected, the system initializes a Large Language Model (LLM), specifically the ChatGPT 3.5 Turbo model with OpenAI API key to analyze and generate responses based on the retrieved content.
 
 **Robust Question-Answering Pipeline:**
-- This integration establishes a robust question-answering (QA) pipeline, making use of the load_qa_chain function, which encompasses multiple components, including the language model.
-- The QA chain efficiently handles lists of input documents (docs) and a list of questions (chunks), with the response variable capturing the results, such as answers to the questions derived from the content within the input documents.
+- The QA pipeline processes the Top K documents and the user query to generate meaningful responses. The system extracts relevant information from the retrieved content, ensuring accuracy and coherence.
+- The LLM analyzes the selected documents and formulates responses by understanding the context within the retrieved text. This approach enhances response quality by focusing on the most relevant data instead of relying solely on the initial query.
 
 **Comprehensive Resume Analysis:**
 - **Summary:** Resume Analyzer AI provides a quick, comprehensive overview of resumes, emphasizing qualifications, key experience, skills, projects, and achievements. Users can swiftly grasp profiles, enhancing review efficiency and insight.
