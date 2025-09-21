@@ -1,6 +1,7 @@
-import { Briefcase, Building, Clock, ExternalLink, MapPin, Search } from 'lucide-react';
+import { Briefcase, Building, Clock, ExternalLink, MapPin, Search, AlertCircle, Download } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { LinkedInScraperService } from '../services/linkedinScraper';
 
 const JobScraper = () => {
   const [searchData, setSearchData] = useState({
@@ -10,6 +11,7 @@ const JobScraper = () => {
   });
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
+  const [error, setError] = useState('');
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -28,24 +30,56 @@ const JobScraper = () => {
     }
 
     setLoading(true);
-    const loadingToast = toast.loading('Searching for jobs...');
+    setError('');
+    setJobs([]);
+    const loadingToast = toast.loading('Scraping LinkedIn jobs...');
 
     try {
-      // Simulate job search - In a real implementation, this would call a backend service
-      // that uses Selenium or LinkedIn API to scrape job data
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Mock job data for demonstration
-      const mockJobs = [
-        {
-          id: 1,
-          title: `Senior ${searchData.jobTitle}`,
-          company: 'Tech Solutions Inc.',
-          location: 'Bangalore, India',
-          type: 'Full-time',
-          postedDate: '2 days ago',
-          description: `We are looking for an experienced ${searchData.jobTitle} to join our dynamic team. The ideal candidate will have strong technical skills and experience in modern development practices.`,
-          url: 'https://linkedin.com/jobs/example-1'
+      // Parse job titles (comma-separated)
+      const jobTitles = searchData.jobTitle
+        .split(',')
+        .map(title => title.trim())
+        .filter(title => title.length > 0);
+
+      if (jobTitles.length === 0) {
+        throw new Error('Please enter valid job titles');
+      }
+
+      // Use LinkedIn scraper service
+      const scrapedJobs = await LinkedInScraperService.scrapeLinkedInJobs(
+        jobTitles,
+        searchData.location,
+        parseInt(searchData.count)
+      );
+
+      if (scrapedJobs.length === 0) {
+        setError('No matching jobs found. Try different keywords or location.');
+        toast.error('No jobs found', { id: loadingToast });
+      } else {
+        // Transform scraped data to match UI expectations
+        const transformedJobs = scrapedJobs.map((job, index) => ({
+          id: index + 1,
+          title: job.title,
+          company: job.company,
+          location: job.location,
+          type: 'Full-time', // Default type
+          postedDate: 'Recently posted',
+          description: job.description || 'Description not available',
+          url: job.url
+        }));
+
+        setJobs(transformedJobs);
+        toast.success(`Found ${transformedJobs.length} jobs!`, { id: loadingToast });
+      }
+
+    } catch (error) {
+      console.error('Job search error:', error);
+      setError(error.message || 'Failed to search jobs. Please try again.');
+      toast.error('Search failed', { id: loadingToast });
+    } finally {
+      setLoading(false);
+    }
+  };
         },
         {
           id: 2,

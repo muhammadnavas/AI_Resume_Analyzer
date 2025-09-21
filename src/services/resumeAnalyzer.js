@@ -9,12 +9,21 @@ export class ResumeAnalyzer {
   }
 
   /**
-   * Generate resume summary
-   * @param {Array} chunks - Text chunks from resume
+   * Generate resume summary with vector search
+   * @param {string} text - Full resume text
    * @returns {Promise<string>} - Generated summary
    */
-  async generateSummary(chunks) {
-    const prompt = this.createSummaryPrompt(chunks);
+  async generateSummary(text) {
+    // Create chunks and add to vector store
+    const chunks = VectorService.createTextChunks(text, 700, 200);
+    this.vectorService.addDocuments(chunks);
+    
+    // Use vector search to find most relevant chunks for summary
+    const relevantChunks = this.vectorService.similaritySearch(
+      "professional experience education skills summary", 5
+    );
+    
+    const prompt = this.createSummaryPrompt(relevantChunks.map(doc => doc.pageContent));
     
     try {
       const result = await this.model.generateContent(prompt);
@@ -27,12 +36,17 @@ export class ResumeAnalyzer {
   }
 
   /**
-   * Analyze resume strengths
-   * @param {Array} chunks - Text chunks from resume
+   * Analyze resume strengths with vector search
+   * @param {string} text - Full resume text
    * @returns {Promise<string>} - Strengths analysis
    */
-  async analyzeStrengths(chunks) {
-    const prompt = this.createStrengthsPrompt(chunks);
+  async analyzeStrengths(text) {
+    // Find strength-related content
+    const relevantChunks = this.vectorService.similaritySearch(
+      "achievements accomplishments skills expertise experience strengths", 5
+    );
+    
+    const prompt = this.createStrengthsPrompt(relevantChunks.map(doc => doc.pageContent));
     
     try {
       const result = await this.model.generateContent(prompt);
