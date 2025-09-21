@@ -50,8 +50,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 pb-4 space-y-2">
-            <div className="mb-6">
+          <nav className="flex-1 px-4 pb-4">
+            <div className="mb-6 mt-4">
               <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                 Main Navigation
               </h3>
@@ -96,18 +96,19 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </div>
             </div>
 
-            {/* Info card */}
-            <div className="mt-auto p-4">
-              <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-                <h4 className="text-sm font-semibold mb-2">
-                  AI Resume Analysis
-                </h4>
-                <p className="text-xs opacity-90 leading-relaxed">
-                  Advanced resume analysis with AI-powered insights for better career opportunities.
-                </p>
-              </div>
-            </div>
           </nav>
+
+          {/* Info card */}
+          <div className="p-4 mt-auto">
+            <div className="bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <h4 className="text-sm font-semibold mb-2">
+                AI Resume Analysis
+              </h4>
+              <p className="text-xs opacity-90 leading-relaxed">
+                Advanced resume analysis with AI-powered insights for better career opportunities.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </>
