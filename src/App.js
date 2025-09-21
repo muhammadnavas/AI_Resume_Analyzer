@@ -60,13 +60,25 @@ function App() {
             />
             
             <main className="flex-1 overflow-y-auto lg:ml-64">
-              <div className="p-6 lg:p-8">
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/analyzer" element={<ResumeAnalyzer />} />
-                  <Route path="/scraper" element={<JobScraper />} />
-                </Routes>
-              </div>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route 
+                  path="/analyzer" 
+                  element={
+                    <div className="p-6 lg:p-8">
+                      <ResumeAnalyzer />
+                    </div>
+                  } 
+                />
+                <Route 
+                  path="/scraper" 
+                  element={
+                    <div className="p-6 lg:p-8">
+                      <JobScraper />
+                    </div>
+                  } 
+                />
+              </Routes>
             </main>
           </div>
         </div>
