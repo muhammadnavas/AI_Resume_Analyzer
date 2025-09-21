@@ -45,7 +45,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-[calc(100vh-4rem)]">
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
         <div className="absolute inset-0 opacity-30">
@@ -130,7 +130,7 @@ const Dashboard = () => {
               Why Choose Our AI Resume Analyzer?
             </h2>
             <p className="text-base text-gray-600 max-w-2xl mx-auto">
-              Built for the GenAI Hackathon 2025 with cutting-edge technology
+              Built for the Advanced AI Resume Analysis with cutting-edge technology
             </p>
           </div>
 

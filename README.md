@@ -92,8 +92,8 @@ This is an advanced React-based application that leverages Google Gemini AI for 
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/gopiashokan/AI-Resume-Analyzer-and-LinkedIn-Scraper-using-Generative-AI.git
-cd AI-Resume-Analyzer-and-LinkedIn-Scraper-using-Generative-AI
+git clone https://github.com/your-username/AI-Resume-Analyzer.git
+cd AI-Resume-Analyzer
 ```
 
 2. **Install dependencies:**
@@ -101,17 +101,12 @@ cd AI-Resume-Analyzer-and-LinkedIn-Scraper-using-Generative-AI
 npm install
 ```
 
-3. **Set up environment variables:**
-```bash
-cp .env.example .env
-```
-
-4. **Start the development server:**
+3. **Start the development server:**
 ```bash
 npm start
 ```
 
-5. **Open your browser:**
+4. **Open your browser:**
 Navigate to `http://localhost:3000`
 
 <br />
@@ -122,81 +117,80 @@ Navigate to `http://localhost:3000`
 
 1. **Launch the Application**
    - Run `npm start` and open `http://localhost:3000`
-   - The application will load with a welcome dashboard
+   - The application loads with a modern dashboard interface
 
-2. **Add Your OpenAI API Key**
-   - Navigate to the Resume Analyzer
-   - Enter your OpenAI API key when prompted
-   - The key is stored locally in your browser
+2. **Configure Google Gemini API**
+   - Navigate to the Resume Analyzer section
+   - Enter your Google Gemini API key when prompted
+   - The key is securely stored in your browser's local storage
 
 3. **Upload Your Resume**
-   - Drag and drop your PDF resume or click to browse
-   - Supported format: PDF only (max 10MB)
-   - The system validates and processes the file
+   - Drag and drop your resume file or click to browse
+   - Supported formats: PDF and DOCX (max 10MB)
+   - Real-time validation and progress indicators
 
 4. **Get Instant Analysis**
    - Click "Analyze Resume" to start the AI processing
    - View comprehensive results across multiple tabs:
-     - **Summary**: Overall resume overview
-     - **Strengths**: Key advantages and highlights
-     - **Improvements**: Areas for enhancement
-     - **Job Suggestions**: Recommended job titles
-     - **Rating**: Detailed scoring breakdown
+     - **Summary**: Overall resume overview with key insights
+     - **Strengths**: Professional advantages and highlights
+     - **Improvements**: Actionable enhancement recommendations
+     - **Job Suggestions**: AI-matched career opportunities
+     - **Rating**: Detailed 10-point scoring breakdown
 
 5. **Export Your Results**
-   - Download a complete analysis report
-   - Use insights to improve your resume
-   - Track progress over time
+   - Download complete analysis as a formatted text report
+   - Use insights to optimize your resume for ATS systems
+   - Track improvement progress over time
 
 ### Advanced Features
 
-#### Resume Rating System
-The application provides detailed scoring across six key areas:
-- **Content Quality** (1-10): Relevance and depth of information
-- **Skills Presentation** (1-10): Technical and soft skills showcase
-- **Experience Description** (1-10): Work experience quality
-- **Achievement Highlights** (1-10): Quantifiable accomplishments
-- **Education & Certifications** (1-10): Educational background relevance  
-- **Overall Professional Impact** (1-10): Overall profile appeal
+#### Professional Rating System
+The application provides detailed scoring across five key areas:
+- **Content Quality** (1-10): Information relevance, clarity, and depth
+- **Structure & Organization** (1-10): Layout and logical flow
+- **Visual Formatting** (1-10): Design and presentation quality
+- **Achievement Impact** (1-10): Quantified accomplishments and results
+- **ATS Compatibility** (1-10): Applicant tracking system optimization
 
-#### Professional Summary Generation
-Automatically creates compelling 2-3 sentence summaries highlighting:
-- Years of experience and expertise areas
-- Most impressive qualifications
-- Key skills and achievements
-- Professional confidence and impact
+#### AI-Generated Professional Summary
+Automatically creates compelling summaries highlighting:
+- Years of experience and core expertise
+- Most impressive qualifications and achievements
+- Key technical and soft skills
+- Professional value proposition
 
 <br />
 
-## **API Integration**
+## **API Configuration**
 
-### OpenAI Configuration
+### Google Gemini Setup
 
-The application uses OpenAI's GPT-3.5 Turbo model with optimized prompts for:
+The application uses Google Gemini 1.5 Flash model for analysis:
 
 ```javascript
 // Example API integration
-const analyzer = new ResumeAnalyzer(apiKey);
-const analysis = await analyzer.performCompleteAnalysis(textChunks);
+const analyzer = new ResumeAnalyzer(geminiApiKey);
+const analysis = await analyzer.performCompleteAnalysis(resumeText);
 ```
 
-### Supported Analysis Types
+### Supported Analysis Features
 
-1. **Resume Summary**: Comprehensive overview of candidate profile
-2. **Strengths Analysis**: Key advantages with supporting evidence  
-3. **Weakness Analysis**: Improvement areas with actionable advice
-4. **Job Title Suggestions**: Career opportunities based on background
-5. **Professional Summary**: Concise resume top-line summary
-6. **Resume Rating**: Multi-criteria scoring system
+1. **Resume Analysis**: Comprehensive professional evaluation
+2. **Strength Analysis**: Professional advantages with evidence
+3. **Improvement Analysis**: Enhancement opportunities with recommendations
+4. **Job Suggestions**: AI-matched career opportunities
+5. **Professional Summary**: Optimized resume summary generation
+6. **Performance Rating**: Multi-criteria scoring with detailed breakdown
 
-### Error Handling
+### Error Handling & Validation
 
-The application includes robust error handling for:
-- Invalid API keys
-- Network connectivity issues
-- PDF processing errors
-- File format/size validation
-- Rate limiting and timeouts
+The application includes comprehensive error handling for:
+- Invalid API keys and authentication issues
+- Network connectivity and timeout problems
+- Document processing errors (PDF/DOCX)
+- File format and size validation
+- Rate limiting and API quota management
 
 <br />
 
@@ -205,24 +199,28 @@ The application includes robust error handling for:
 ```
 src/
 ├── components/           # Reusable UI components
-│   ├── Header.js        # App header with navigation
-│   ├── Sidebar.js       # Navigation sidebar
-│   └── FileUpload.js    # PDF upload component
+│   ├── FileUpload.js    # File upload with drag & drop
+│   └── FormattedContent.js # Enhanced text display
 ├── pages/               # Main application pages  
-│   ├── Dashboard.js     # Landing page
+│   ├── Dashboard.js     # Landing page with features overview
 │   ├── ResumeAnalyzer.js # Resume analysis interface
-│   └── JobScraper.js    # Job search interface
-├── services/            # Business logic and API calls
-│   ├── pdfProcessor.js  # PDF text extraction
-│   └── resumeAnalyzer.js # OpenAI integration
+│   └── JobScraper.js    # LinkedIn job search demo
+├── services/            # Business logic and API integration
+│   ├── documentProcessor.js  # Unified PDF/DOCX processing
+│   ├── pdfProcessor.js      # PDF text extraction
+│   ├── docxProcessor.js     # DOCX text extraction
+│   ├── resumeAnalyzer.js    # Google Gemini integration
+│   └── vectorService.js     # Text similarity search
+├── utils/               # Helper utilities
+│   └── textFormatter.js    # Text processing and formatting
 ├── context/             # React context for state management
-│   └── ApiKeyContext.js # API key management
+│   └── ApiKeyContext.js    # API key management
 ├── App.js              # Main application component
 ├── index.js            # Application entry point
-└── index.css           # Global styles and Tailwind imports
+└── index.css           # Global styles and Tailwind CSS
 ```
 
-### Key Components
+### Key Features
 
 #### PDF Processor (`services/pdfProcessor.js`)
 - Text extraction using PDF.js

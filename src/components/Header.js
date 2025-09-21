@@ -22,10 +22,10 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
             </div>
             <div>
               <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                Resume Analyzer
+                AI Resume Analyzer
               </h1>
               <p className="text-xs text-gray-500 hidden sm:block font-medium">
-                GenAI-Powered Insights
+                Career Optimization Platform
               </p>
             </div>
           </div>
