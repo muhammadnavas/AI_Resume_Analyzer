@@ -1,41 +1,51 @@
-import { AlertCircle, FileText, Upload, X } from 'lucide-react';
+import { AlertCircle, Upload, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import toast from 'react-hot-toast';
+import { DocumentProcessor } from '../services/documentProcessor';
 
-const FileUpload = ({ onFileSelect, isProcessing = false, accept = '.pdf' }) => {
+const FileUpload = ({ onFileSelect, isProcessing = false }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
   const [dragActive, setDragActive] = useState(false);
+
+  const supportedTypes = DocumentProcessor.getSupportedTypes();
 
   const onDrop = useCallback((acceptedFiles, rejectedFiles) => {
     setDragActive(false);
     
     if (rejectedFiles.length > 0) {
-      toast.error('Please upload a valid PDF file only');
+      const rejectedFile = rejectedFiles[0];
+      if (rejectedFile.errors.some(error => error.code === 'file-too-large')) {
+        toast.error(`File size must be less than ${supportedTypes.maxSizeText}`);
+      } else {
+        toast.error('Please upload a valid PDF or Word document');
+      }
       return;
     }
 
     if (acceptedFiles.length > 0) {
       const file = acceptedFiles[0];
       
-      // Validate file size (max 10MB)
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('File size must be less than 10MB');
+      // Additional validation using our DocumentProcessor
+      const validation = DocumentProcessor.validateFile(file);
+      if (!validation.isValid) {
+        toast.error(validation.errors.join(', '));
         return;
       }
 
       setUploadedFile(file);
       onFileSelect(file);
-      toast.success('File uploaded successfully!');
+      
+      const fileType = validation.fileType.toUpperCase();
+      toast.success(`${fileType} file uploaded successfully!`);
     }
-  }, [onFileSelect]);
+  }, [onFileSelect, supportedTypes.maxSizeText]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: {
-      'application/pdf': ['.pdf']
-    },
+    accept: supportedTypes.accept,
     maxFiles: 1,
+    maxSize: supportedTypes.maxSize,
     onDragEnter: () => setDragActive(true),
     onDragLeave: () => setDragActive(false),
     disabled: isProcessing
@@ -56,17 +66,23 @@ const FileUpload = ({ onFileSelect, isProcessing = false, accept = '.pdf' }) => 
   };
 
   if (uploadedFile) {
+    const fileType = DocumentProcessor.getFileType(uploadedFile);
+    const fileIcon = DocumentProcessor.getFileIcon(fileType);
+    const colorClass = DocumentProcessor.getFileTypeColor(fileType);
+    
     return (
       <div className="w-full">
         <div className="border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
-                <FileText className="w-6 h-6 text-white" />
+              <div className={`w-12 h-12 bg-gradient-to-br ${colorClass} rounded-2xl flex items-center justify-center shadow-lg`}>
+                <span className="text-xl">{fileIcon}</span>
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">{uploadedFile.name}</p>
-                <p className="text-xs text-gray-600 font-medium">{formatFileSize(uploadedFile.size)}</p>
+                <p className="text-xs text-gray-600 font-medium">
+                  {formatFileSize(uploadedFile.size)} • {fileType.toUpperCase()}
+                </p>
               </div>
             </div>
             
@@ -124,13 +140,13 @@ const FileUpload = ({ onFileSelect, isProcessing = false, accept = '.pdf' }) => 
               {isDragActive ? 'Drop your resume here' : 'Upload your resume'}
             </p>
             <p className="text-sm text-gray-600 font-medium">
-              Drag and drop your PDF file here, or click to browse
+              Drag and drop your PDF or Word document here, or click to browse
             </p>
           </div>
           
           <div className="text-xs text-gray-500 space-y-1">
-            <p className="font-medium">Supported format: PDF only</p>
-            <p>Maximum file size: 10MB</p>
+            <p className="font-medium">Supported formats: PDF, DOCX, DOC</p>
+            <p>Maximum file size: {supportedTypes.maxSizeText}</p>
           </div>
         </div>
       </div>
@@ -144,9 +160,10 @@ const FileUpload = ({ onFileSelect, isProcessing = false, accept = '.pdf' }) => 
           <div className="text-sm text-blue-700">
             <p className="font-semibold mb-2">Tips for best results:</p>
             <ul className="space-y-1 list-disc list-inside text-xs leading-relaxed">
-              <li>Use a clear, well-formatted PDF resume</li>
+              <li>Use a clear, well-formatted PDF or Word document</li>
               <li>Ensure text is selectable (not scanned images)</li>
               <li>Include all relevant sections: skills, experience, education</li>
+              <li>For Word docs, use standard formatting for best text extraction</li>
             </ul>
           </div>
         </div>

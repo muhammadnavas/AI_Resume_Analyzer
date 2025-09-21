@@ -143,53 +143,121 @@ export class ResumeAnalyzer {
 
   // Prompt creation methods optimized for Gemini
   createSummaryPrompt(chunks) {
-    return `You are an expert resume analyst. Please provide a detailed summarization of the following resume content and conclude with key insights:
+    return `You are an expert resume analyst. Please provide a detailed summarization of the following resume content in a structured, point-based format:
 
 RESUME CONTENT:
 ${chunks.join('\n\n')}
 
-Please provide a comprehensive summary including:
-1. Professional background and experience level
-2. Key skills and technical competencies
-3. Notable achievements and accomplishments
-4. Education and certifications
-5. Overall career trajectory and focus areas
+Please provide a comprehensive summary with clear sections and bullet points:
 
-Keep the summary professional, detailed, and insightful.`;
+1. PROFESSIONAL BACKGROUND AND EXPERIENCE LEVEL
+- Write 2-3 specific bullet points about their experience level and background
+- Include years of experience if mentioned
+- Highlight their main professional focus
+
+2. KEY SKILLS AND TECHNICAL COMPETENCIES  
+- List specific technical skills mentioned
+- Include programming languages, frameworks, tools
+- Mention any certifications or specialized knowledge
+
+3. NOTABLE ACHIEVEMENTS AND ACCOMPLISHMENTS
+- Highlight specific projects or achievements
+- Include any quantifiable results or metrics
+- Mention awards, recognition, or standout work
+
+4. EDUCATION AND CERTIFICATIONS
+- Educational background and degrees
+- Relevant certifications or training
+- Academic achievements or projects
+
+5. OVERALL CAREER TRAJECTORY AND FOCUS AREAS
+- Career direction and goals
+- Areas of specialization or interest
+- Growth potential and future opportunities
+
+Use clear, concise bullet points. Each point should be specific and informative. Avoid generic statements.`;
   }
 
   createStrengthsPrompt(chunks) {
-    return `You are an expert career counselor. Please analyze the following resume content and identify key strengths:
+    return `You are an expert career counselor. Please analyze the following resume content and identify key strengths in a structured format:
 
 RESUME CONTENT:
 ${chunks.join('\n\n')}
 
-Analyze and explain the candidate's key strengths including:
-1. Technical skills and expertise
-2. Professional experience highlights
-3. Leadership and soft skills
-4. Educational qualifications
-5. Unique value propositions
-6. Industry knowledge and domain expertise
+Analyze and explain the candidate's key strengths with specific bullet points:
 
-Provide specific examples from the resume to support each strength identified.`;
+1. TECHNICAL SKILLS AND EXPERTISE
+- List specific technical strengths with examples
+- Mention programming languages, frameworks, tools they excel in
+- Highlight any advanced or specialized technical knowledge
+
+2. PROFESSIONAL EXPERIENCE HIGHLIGHTS
+- Key achievements in their work experience
+- Specific projects or roles that demonstrate competency
+- Leadership or team collaboration examples
+
+3. LEADERSHIP AND SOFT SKILLS
+- Communication, teamwork, or leadership abilities shown
+- Problem-solving examples from their experience
+- Any management or mentoring experience
+
+4. EDUCATIONAL QUALIFICATIONS
+- Relevant degrees, certifications, or training
+- Academic projects or achievements
+- Continuous learning or professional development
+
+5. UNIQUE VALUE PROPOSITIONS
+- What makes this candidate stand out
+- Unique combination of skills or experience
+- Special accomplishments or recognition
+
+6. INDUSTRY KNOWLEDGE AND DOMAIN EXPERTISE
+- Specific industry knowledge or experience
+- Domain expertise in particular areas
+- Understanding of industry trends or technologies
+
+Provide specific examples from the resume to support each strength identified. Use clear bullet points for easy reading.`;
   }
 
   createWeaknessesPrompt(chunks) {
-    return `You are an expert resume reviewer. Please analyze the following resume content and identify areas for improvement:
+    return `You are an expert resume reviewer. Please analyze the following resume content and identify areas for improvement with specific, actionable suggestions:
 
 RESUME CONTENT:
 ${chunks.join('\n\n')}
 
-Analyze potential weaknesses and provide constructive improvement suggestions:
-1. Missing skills or qualifications for target roles
-2. Gaps in experience or career progression
-3. Presentation and formatting issues
-4. Missing achievements or quantifiable results
-5. Areas where additional certifications might help
-6. Ways to better highlight existing strengths
+Analyze potential weaknesses and provide constructive improvement suggestions with clear bullet points:
 
-Focus on actionable advice to improve the resume's effectiveness.`;
+1. MISSING SKILLS OR QUALIFICATIONS FOR TARGET ROLES
+- Identify specific technical skills that could be added
+- Suggest relevant certifications or training
+- Highlight gaps in required qualifications for their field
+
+2. GAPS IN EXPERIENCE OR CAREER PROGRESSION
+- Point out any unexplained employment gaps
+- Suggest ways to address career progression concerns
+- Recommend experience-building opportunities
+
+3. PRESENTATION AND FORMATTING ISSUES
+- Identify specific formatting or structure problems
+- Suggest improvements to layout and organization
+- Recommend better ways to present information
+
+4. MISSING ACHIEVEMENTS OR QUANTIFIABLE RESULTS
+- Point out lack of specific metrics or numbers
+- Suggest how to quantify their accomplishments
+- Recommend adding measurable impact statements
+
+5. AREAS WHERE ADDITIONAL CERTIFICATIONS MIGHT HELP
+- Suggest specific certifications for their field
+- Recommend training programs or courses
+- Identify skill gaps that certifications could fill
+
+6. WAYS TO BETTER HIGHLIGHT EXISTING STRENGTHS
+- Suggest better positioning of current skills
+- Recommend rewriting weak sections
+- Advise on emphasizing valuable experience
+
+Focus on actionable advice with specific recommendations. Use clear bullet points for each suggestion.`;
   }
 
   createJobTitlesPrompt(chunks) {
@@ -198,13 +266,21 @@ Focus on actionable advice to improve the resume's effectiveness.`;
 RESUME CONTENT:
 ${chunks.join('\n\n')}
 
-Suggest 8-10 specific job titles that align with this candidate's background, including:
-1. Current level positions (matching experience)
-2. Growth/advancement opportunities
-3. Different industries where skills could transfer
-4. Emerging roles in relevant fields
+Suggest 8-10 specific job titles that align with this candidate's background, organized by category:
 
-For each suggestion, briefly explain why it's a good fit based on the candidate's background.`;
+CURRENT LEVEL POSITIONS (matching experience):
+[List 3-4 positions]
+
+GROWTH/ADVANCEMENT OPPORTUNITIES:
+[List 2-3 positions]
+
+DIFFERENT INDUSTRIES WHERE SKILLS COULD TRANSFER:
+[List 2-3 positions]
+
+EMERGING ROLES IN RELEVANT FIELDS:
+[List 1-2 positions]
+
+For each suggestion, briefly explain why it's a good fit based on the candidate's background. Use clear section headings without markdown formatting (no ** or # symbols). Write in a natural, flowing manner.`;
   }
 
   createProfessionalSummaryPrompt(chunks) {

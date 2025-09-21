@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
     ArrowRight,
     Award,
@@ -8,11 +9,84 @@ import {
     Target,
     TrendingUp,
     Users,
-    Zap
+    Zap,
+    RefreshCw
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { RAGService } from '../services/ragService';
 
 const Dashboard = () => {
+  const [stats, setStats] = useState([]);
+  const [isLoadingStats, setIsLoadingStats] = useState(true);
+  const [ragService, setRagService] = useState(null);
+
+  // Initialize RAG Service
+  useEffect(() => {
+    const initializeRAG = async () => {
+      try {
+        // Get API key from localStorage or environment
+        const apiKey = localStorage.getItem('geminiApiKey') || process.env.REACT_APP_GEMINI_API_KEY;
+        if (apiKey) {
+          const rag = new RAGService(apiKey);
+          setRagService(rag);
+          await loadDynamicStats(rag);
+        } else {
+          // Fallback to default stats if no API key
+          setStats(getDefaultStats());
+          setIsLoadingStats(false);
+        }
+      } catch (error) {
+        console.error('Error initializing RAG service:', error);
+        setStats(getDefaultStats());
+        setIsLoadingStats(false);
+      }
+    };
+
+    initializeRAG();
+  }, []);
+
+  const loadDynamicStats = async (ragServiceInstance) => {
+    try {
+      setIsLoadingStats(true);
+      const dynamicStats = await ragServiceInstance.generateDashboardStats();
+      
+      // Map icons correctly
+      const statsWithIcons = dynamicStats.map(stat => ({
+        ...stat,
+        icon: getIconComponent(stat.icon)
+      }));
+      
+      setStats(statsWithIcons);
+    } catch (error) {
+      console.error('Error loading dynamic stats:', error);
+      setStats(getDefaultStats());
+    } finally {
+      setIsLoadingStats(false);
+    }
+  };
+
+  const getIconComponent = (iconName) => {
+    const iconMap = {
+      'users': Users,
+      'award': Award,
+      'trending-up': TrendingUp,
+      'star': Star
+    };
+    return iconMap[iconName] || Users;
+  };
+
+  const getDefaultStats = () => [
+    { icon: Users, label: 'Resumes Analyzed', value: '500+' },
+    { icon: Award, label: 'Success Rate', value: '89%' },
+    { icon: TrendingUp, label: 'Career Growth', value: '35%' },
+    { icon: Star, label: 'User Rating', value: '4.7/5' }
+  ];
+
+  const refreshStats = async () => {
+    if (ragService) {
+      await loadDynamicStats(ragService);
+    }
+  };
   const features = [
     {
       icon: FileText,
