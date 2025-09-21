@@ -100,7 +100,7 @@ A modern React-based application that provides comprehensive resume analysis usi
 
 1. **Clone the repository:**
 ```bash
-git clone https://github.com/your-username/AI-Resume-Analyzer.git
+git clone https://github.com/muhammadnavas/AI-Resume-Analyzer.git
 cd AI-Resume-Analyzer
 ```
 
@@ -228,14 +228,6 @@ AI-Resume-Analyzer/
 3. **Commit your changes:** `git commit -m 'Add some AmazingFeature'`
 4. **Push to the branch:** `git push origin feature/AmazingFeature`
 5. **Open a Pull Request**
-
-<br />
-
-## **License**
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-<br />
 
 ---
 
