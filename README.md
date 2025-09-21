@@ -168,165 +168,77 @@ Navigate to `http://localhost:3000`
 
 <br />
 
-## **Installation**
-
-### Prerequisites
-- **Node.js** (version 16 or higher)
-- **npm** (comes with Node.js)
-- **Google Gemini API Key** (get from [Google AI Studio](https://makersuite.google.com/))
-
-### Quick Setup
-
-#### Manual Installation:
-
-1. **Clone the repository:**
-```bash
-git clone https://github.com/your-username/AI-Resume-Analyzer.git
-cd AI-Resume-Analyzer
-```
-
-2. **Install dependencies:**
-```bash
-npm install
-```
-
-3. **Start the development server:**
-```bash
-npm start
-```
-
-4. **Open your browser:**
-Navigate to `http://localhost:3000`
-
-<br />
-
-## **Usage**
-
-### Getting Started
-
-1. **Launch the Application**
-   - Run `npm start` and open `http://localhost:3000`
-   - The application loads with a modern dashboard interface
-
-2. **Configure Google Gemini API**
-   - Navigate to the Resume Analyzer section
-   - Enter your Google Gemini API key when prompted
-   - The key is securely stored in your browser's local storage
-
-3. **Upload Your Resume**
-   - Drag and drop your resume file or click to browse
-   - Supported formats: PDF and DOCX (max 10MB)
-   - Real-time validation and progress indicators
-
-4. **Get Instant Analysis**
-   - Click "Analyze Resume" to start the AI processing
-   - View comprehensive results across multiple tabs:
-     - **Summary**: Overall resume overview with key insights
-     - **Strengths**: Professional advantages and highlights
-     - **Improvements**: Actionable enhancement recommendations
-     - **Job Suggestions**: AI-matched career opportunities
-     - **Rating**: Detailed 10-point scoring breakdown
-
-5. **Export Your Results**
-   - Download complete analysis as a formatted text report
-   - Use insights to optimize your resume for ATS systems
-   - Track improvement progress over time
-
-### Advanced Features
-
-#### Professional Rating System
-The application provides detailed scoring across five key areas:
-- **Content Quality** (1-10): Information relevance, clarity, and depth
-- **Structure & Organization** (1-10): Layout and logical flow
-- **Visual Formatting** (1-10): Design and presentation quality
-- **Achievement Impact** (1-10): Quantified accomplishments and results
-- **ATS Compatibility** (1-10): Applicant tracking system optimization
-
-#### AI-Generated Professional Summary
-Automatically creates compelling summaries highlighting:
-- Years of experience and core expertise
-- Most impressive qualifications and achievements
-- Key technical and soft skills
-- Professional value proposition
-
-<br />
-
 ## **API Configuration**
 
-### Google Gemini Setup
+### **Google Gemini Setup**
 
-The application uses Google Gemini 1.5 Flash model for analysis:
+1. **Get API Key:**
+   - Visit [Google AI Studio](https://makersuite.google.com/)
+   - Sign in with your Google account
+   - Create a new API key for Gemini 1.5 Flash
 
-```javascript
-// Example API integration
-const analyzer = new ResumeAnalyzer(geminiApiKey);
-const analysis = await analyzer.performCompleteAnalysis(resumeText);
-```
+2. **Configure in Application:**
+   - Navigate to Resume Analyzer page
+   - Enter API key in the configuration field
+   - Key is securely stored in browser's local storage
 
-### Supported Analysis Features
-
-1. **Resume Analysis**: Comprehensive professional evaluation
-2. **Strength Analysis**: Professional advantages with evidence
-3. **Improvement Analysis**: Enhancement opportunities with recommendations
-4. **Job Suggestions**: AI-matched career opportunities
-5. **Professional Summary**: Optimized resume summary generation
-6. **Performance Rating**: Multi-criteria scoring with detailed breakdown
-
-### Error Handling & Validation
-
-The application includes comprehensive error handling for:
-- Invalid API keys and authentication issues
-- Network connectivity and timeout problems
-- Document processing errors (PDF/DOCX)
-- File format and size validation
-- Rate limiting and API quota management
+3. **Usage Notes:**
+   - Free tier includes generous quotas for testing
+   - Rate limiting is handled automatically by the application
+   - API key is only stored locally in your browser
 
 <br />
 
 ## **Project Structure**
 
 ```
-src/
-├── components/           # Reusable UI components
-│   ├── FileUpload.js    # File upload with drag & drop
-│   └── FormattedContent.js # Enhanced text display
-├── pages/               # Main application pages  
-│   ├── Dashboard.js     # Landing page with features overview
-│   ├── ResumeAnalyzer.js # Resume analysis interface
-│   └── JobScraper.js    # LinkedIn job search demo
-├── services/            # Business logic and API integration
-│   ├── documentProcessor.js  # Unified PDF/DOCX processing
-│   ├── pdfProcessor.js      # PDF text extraction
-│   ├── docxProcessor.js     # DOCX text extraction
-│   ├── resumeAnalyzer.js    # Google Gemini integration
-│   └── vectorService.js     # Text similarity search
-├── utils/               # Helper utilities
-│   └── textFormatter.js    # Text processing and formatting
-├── context/             # React context for state management
-│   └── ApiKeyContext.js    # API key management
-├── App.js              # Main application component
-├── index.js            # Application entry point
-└── index.css           # Global styles and Tailwind CSS
+AI-Resume-Analyzer/
+├── public/                    # Static assets and index.html
+├── src/
+│   ├── components/           # Reusable React components
+│   │   ├── Header.js        # Main navigation header
+│   │   ├── Sidebar.js       # Dashboard sidebar navigation
+│   │   ├── FileUpload.js    # Drag & drop file upload
+│   │   └── ...
+│   ├── pages/               # Main page components
+│   │   ├── Dashboard.js     # Landing dashboard
+│   │   ├── ResumeAnalyzer.js # AI analysis interface
+│   │   ├── JobScraper.js    # Job search demo
+│   │   └── ...
+│   ├── services/            # Business logic and API integration
+│   │   ├── resumeAnalyzer.js # Google Gemini AI integration
+│   │   ├── documentProcessor.js # PDF/DOCX text extraction
+│   │   ├── realJobSearchService.js # Demo job search data
+│   │   └── ...
+│   ├── context/             # React context providers
+│   │   └── ApiKeyContext.js # API key state management
+│   ├── App.js              # Main application component
+│   └── index.js            # Application entry point
+├── package.json            # Project dependencies and scripts
+├── tailwind.config.js      # Tailwind CSS configuration
+└── README.md              # Project documentation
 ```
 
-### Key Features
+<br />
 
-#### PDF Processor (`services/pdfProcessor.js`)
-- Text extraction using PDF.js
-- Document chunking for AI processing
-- Metadata extraction and file validation
-- Basic section identification
+## **Contributing**
 
-#### Resume Analyzer (`services/resumeAnalyzer.js`)  
-- OpenAI API integration
-- Prompt engineering for each analysis type
-- Response parsing and formatting
-- Error handling and retry logic
-
-#### File Upload (`components/FileUpload.js`)
-- Drag & drop functionality
-- File validation and size limits
-- Progress indicators and error handling
-- Visual feedback for user interactions
+1. **Fork the repository**
+2. **Create your feature branch:** `git checkout -b feature/AmazingFeature`
+3. **Commit your changes:** `git commit -m 'Add some AmazingFeature'`
+4. **Push to the branch:** `git push origin feature/AmazingFeature`
+5. **Open a Pull Request**
 
 <br />
+
+## **License**
+
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+
+<br />
+
+---
+
+**🚀 Ready to optimize your resume? Start your career journey today!**
+
+*Built with ❤️ using React and Google Gemini AI*
