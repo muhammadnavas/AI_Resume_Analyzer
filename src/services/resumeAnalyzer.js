@@ -1,11 +1,53 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { VectorService } from './vectorService';
+import { LinkedInJobSearch } from './linkedinJobSearch.js';
+import { RealJobSearchService } from './realJobSearchService.js';
+import { VectorService } from './vectorService.js';
 
 export class ResumeAnalyzer {
   constructor(apiKey) {
     this.genAI = new GoogleGenerativeAI(apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Use the free Gemini Flash model with optimized settings
+    this.model = this.genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 2048,
+      }
+    });
     this.vectorService = new VectorService();
+    this.jobSearch = new LinkedInJobSearch();
+    this.realJobSearch = new RealJobSearchService();
+  }
+
+  /**
+   * Helper method to handle Gemini API calls with consistent error handling
+   * @param {string} prompt - The prompt to send to Gemini
+   * @param {string} operation - The operation name for error messages
+   * @returns {Promise<string>} - The generated response
+   */
+  async callGeminiAPI(prompt, operation) {
+    try {
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    } catch (error) {
+      console.error(`Error in ${operation}:`, error);
+      
+      // Handle specific API errors for free tier
+      if (error.message.includes('quota') || error.message.includes('rate limit')) {
+        throw new Error('Gemini API quota exceeded. Please try again later or check your usage limits.');
+      } else if (error.message.includes('404') || error.message.includes('not found')) {
+        throw new Error('Gemini Flash model not accessible. Please verify your API key has access to gemini-1.5-flash.');
+      } else if (error.message.includes('403') || error.message.includes('forbidden')) {
+        throw new Error('API access forbidden. Please check your API key permissions.');
+      } else if (error.message.includes('429')) {
+        throw new Error('Too many requests. Please wait a moment before trying again.');
+      }
+      
+      throw new Error(`${operation} failed: ${error.message}`);
+    }
   }
 
   /**
@@ -25,14 +67,7 @@ export class ResumeAnalyzer {
     
     const prompt = this.createSummaryPrompt(relevantChunks.map(doc => doc.pageContent));
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error generating summary:', error);
-      throw new Error('Failed to generate resume summary');
-    }
+    return await this.callGeminiAPI(prompt, 'Resume summary generation');
   }
 
   /**
@@ -48,14 +83,7 @@ export class ResumeAnalyzer {
     
     const prompt = this.createStrengthsPrompt(relevantChunks.map(doc => doc.pageContent));
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error analyzing strengths:', error);
-      throw new Error('Failed to analyze resume strengths');
-    }
+    return await this.callGeminiAPI(prompt, 'Resume strengths analysis');
   }
 
   /**
@@ -66,14 +94,7 @@ export class ResumeAnalyzer {
   async analyzeWeaknesses(chunks) {
     const prompt = this.createWeaknessesPrompt(chunks);
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error analyzing weaknesses:', error);
-      throw new Error('Failed to analyze resume weaknesses');
-    }
+    return await this.callGeminiAPI(prompt, 'Resume weaknesses analysis');
   }
 
   /**
@@ -84,14 +105,7 @@ export class ResumeAnalyzer {
   async suggestJobTitles(chunks) {
     const prompt = this.createJobTitlesPrompt(chunks);
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error suggesting job titles:', error);
-      throw new Error('Failed to suggest job titles');
-    }
+    return await this.callGeminiAPI(prompt, 'Job titles suggestion');
   }
 
   /**
@@ -102,14 +116,7 @@ export class ResumeAnalyzer {
   async generateProfessionalSummary(chunks) {
     const prompt = this.createProfessionalSummaryPrompt(chunks);
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error generating professional summary:', error);
-      throw new Error('Failed to generate professional summary');
-    }
+    return await this.callGeminiAPI(prompt, 'Professional summary generation');
   }
 
   /**
@@ -120,14 +127,8 @@ export class ResumeAnalyzer {
   async rateResume(chunks) {
     const prompt = this.createRatingPrompt(chunks);
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return this.parseRatingResponse(response.text());
-    } catch (error) {
-      console.error('Error rating resume:', error);
-      throw new Error('Failed to rate resume');
-    }
+    const response = await this.callGeminiAPI(prompt, 'Resume rating');
+    return this.parseRatingResponse(response);
   }
 
   /**
@@ -139,14 +140,7 @@ export class ResumeAnalyzer {
   async compareWithJobTitle(chunks, jobTitle) {
     const prompt = this.createJobComparisonPrompt(chunks, jobTitle);
     
-    try {
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      return response.text();
-    } catch (error) {
-      console.error('Error comparing with job title:', error);
-      throw new Error('Failed to compare resume with job title');
-    }
+    return await this.callGeminiAPI(prompt, 'Job title comparison');
   }
 
   // Prompt creation methods optimized for Gemini
@@ -232,29 +226,63 @@ Write only the professional summary, no additional commentary.`;
   }
 
   createRatingPrompt(chunks) {
-    return `Rate this resume on a scale of 1-10 for each criterion and provide an overall score:
+    return `Rate this resume using professional recruiter standards on a 10-point scale across these critical areas:
 
 RESUME CONTENT:
 ${chunks.join('\n\n')}
 
-Rate the following aspects (1-10 scale):
-1. Content Quality: Relevance and depth of information
-2. Skills Presentation: How well technical and soft skills are showcased
-3. Experience Description: Quality of work experience descriptions
-4. Achievement Highlights: Presence of quantifiable accomplishments
-5. Education & Certifications: Educational background relevance
-5. Education & Certifications: Academic and professional credentials
-6. Overall Professional Impact: How compelling the overall profile is
+Rate each category (0-2 points each, total 10 points):
+
+1. CONTENT QUALITY (0-2 points):
+   - 2: Strong, relevant, quantified achievements with measurable results
+   - 1: Some achievements present but mixed with generic duties
+   - 0: Weak, vague, irrelevant details without impact metrics
+
+2. STRUCTURE & ORGANIZATION (0-2 points):
+   - 2: Clear logical flow (Summary → Skills → Experience → Education), easy to scan
+   - 1: Somewhat organized but confusing sections or poor flow
+   - 0: Poor structure, hard to read, illogical organization
+
+3. FORMATTING & DESIGN (0-2 points):
+   - 2: Clean, consistent, professional formatting with proper spacing
+   - 1: Minor issues with spacing, alignment, or consistency
+   - 0: Messy, inconsistent formatting, distracting elements
+
+4. IMPACT & LANGUAGE (0-2 points):
+   - 2: Strong action verbs, quantified results, compelling summary
+   - 1: Mixed language; some power verbs but also generic phrases
+   - 0: Passive language, weak wording, no measurable impact
+
+5. ATS COMPATIBILITY (0-2 points):
+   - 2: ATS-friendly format, keyword optimized, industry-specific terms
+   - 1: Minor ATS risks (some formatting issues, missing some keywords)
+   - 0: Likely ATS rejection (poor keyword usage, complex formatting)
+
+EVALUATION CRITERIA:
+- Look for quantified achievements (percentages, numbers, metrics)
+- Check for action verbs (Built, Optimized, Led, Achieved vs "Responsible for")
+- Assess keyword usage for industry relevance
+- Evaluate readability and professional presentation
+- Consider ATS parsing compatibility
 
 Format your response as:
-Content Quality: X/10 - Brief explanation
-Skills Presentation: X/10 - Brief explanation
-Experience Description: X/10 - Brief explanation
-Achievement Highlights: X/10 - Brief explanation
-Education & Certifications: X/10 - Brief explanation
-Overall Professional Impact: X/10 - Brief explanation
+Content Quality: X/2 - [Specific feedback on achievements vs duties, relevance, keywords]
+Structure & Organization: X/2 - [Feedback on flow, clarity, section order]
+Formatting & Design: X/2 - [Assessment of visual presentation and consistency]
+Impact & Language: X/2 - [Evaluation of action verbs, quantification, summary strength]
+ATS Compatibility: X/2 - [Analysis of keyword usage and format compatibility]
 
-OVERALL SCORE: X/10`;
+TOTAL SCORE: X/10
+
+GRADE INTERPRETATION:
+- 9-10: Excellent (job-ready, strong competitive advantage)
+- 7-8: Good (minor polish needed, solid foundation)
+- 5-6: Average (needs improvement, several areas to address)
+- 3-4: Weak (requires major fixes, significant gaps)
+- 0-2: Poor (needs complete rewrite, not usable as is)
+
+SPECIFIC IMPROVEMENT RECOMMENDATIONS:
+[Provide 3-5 actionable suggestions for the lowest-scoring areas]`;
   }
 
   createJobComparisonPrompt(chunks, jobTitle) {
@@ -275,32 +303,32 @@ Be specific about technical requirements, years of experience, and industry know
   }
 
   /**
-   * Parse the rating response to extract numerical scores
-   * @param {string} response - Raw response from OpenAI
+   * Parse the rating response to extract numerical scores (new 10-point system)
+   * @param {string} response - Raw response from Gemini
    * @returns {Object} - Parsed rating data
    */
   parseRatingResponse(response) {
     const ratings = {
       contentQuality: 0,
-      skillsPresentation: 0,
-      experienceDescription: 0,
-      achievementHighlights: 0,
-      educationCertifications: 0,
-      overallImpact: 0,
-      overallScore: 0,
+      structureOrganization: 0,
+      formattingDesign: 0,
+      impactLanguage: 0,
+      atsCompatibility: 0,
+      totalScore: 0,
+      grade: '',
+      improvements: [],
       breakdown: response
     };
 
     try {
-      // Extract individual scores using regex
+      // Extract individual scores using regex for new format
       const patterns = {
-        contentQuality: /Content Quality:\s*(\d+)/i,
-        skillsPresentation: /Skills Presentation:\s*(\d+)/i,
-        experienceDescription: /Experience Description:\s*(\d+)/i,
-        achievementHighlights: /Achievement Highlights:\s*(\d+)/i,
-        educationCertifications: /Education & Certifications:\s*(\d+)/i,
-        overallImpact: /Overall Professional Impact:\s*(\d+)/i,
-        overallScore: /OVERALL SCORE:\s*(\d+)/i
+        contentQuality: /Content Quality:\s*(\d+)\/2/i,
+        structureOrganization: /Structure & Organization:\s*(\d+)\/2/i,
+        formattingDesign: /Formatting & Design:\s*(\d+)\/2/i,
+        impactLanguage: /Impact & Language:\s*(\d+)\/2/i,
+        atsCompatibility: /ATS Compatibility:\s*(\d+)\/2/i,
+        totalScore: /TOTAL SCORE:\s*(\d+)\/10/i
       };
 
       Object.keys(patterns).forEach(key => {
@@ -310,21 +338,35 @@ Be specific about technical requirements, years of experience, and industry know
         }
       });
 
-      // Calculate overall score if not found
-      if (ratings.overallScore === 0) {
-        const scores = [
-          ratings.contentQuality,
-          ratings.skillsPresentation,
-          ratings.experienceDescription,
-          ratings.achievementHighlights,
-          ratings.educationCertifications,
-          ratings.overallImpact
-        ].filter(score => score > 0);
-        
-        if (scores.length > 0) {
-          ratings.overallScore = Math.round(scores.reduce((a, b) => a + b) / scores.length);
-        }
+      // Calculate total score if not found
+      if (ratings.totalScore === 0) {
+        ratings.totalScore = ratings.contentQuality + ratings.structureOrganization + 
+                           ratings.formattingDesign + ratings.impactLanguage + 
+                           ratings.atsCompatibility;
       }
+
+      // Determine grade based on total score
+      if (ratings.totalScore >= 9) {
+        ratings.grade = 'Excellent (Job-Ready)';
+      } else if (ratings.totalScore >= 7) {
+        ratings.grade = 'Good (Minor Polish Needed)';
+      } else if (ratings.totalScore >= 5) {
+        ratings.grade = 'Average (Needs Improvement)';
+      } else if (ratings.totalScore >= 3) {
+        ratings.grade = 'Weak (Major Fixes Required)';
+      } else {
+        ratings.grade = 'Poor (Complete Rewrite Needed)';
+      }
+
+      // Extract improvement recommendations
+      const improvementMatch = response.match(/SPECIFIC IMPROVEMENT RECOMMENDATIONS:\s*([\s\S]*?)(?:\n\n|$)/i);
+      if (improvementMatch) {
+        const improvementText = improvementMatch[1].trim();
+        ratings.improvements = improvementText.split('\n')
+          .filter(line => line.trim().length > 0)
+          .map(line => line.replace(/^[-•]\s*/, '').trim());
+      }
+
     } catch (error) {
       console.error('Error parsing rating response:', error);
     }
@@ -333,20 +375,171 @@ Be specific about technical requirements, years of experience, and industry know
   }
 
   /**
-   * Perform complete resume analysis
+   * Search for relevant jobs based on resume content
+   * @param {string} resumeText - Full resume text
+   * @param {Object} options - Search options
+   * @returns {Promise<Object>} - Job search results
+   */
+  async searchJobs(resumeText, options = {}) {
+    try {
+      // Extract skills and experience from resume
+      const extractedData = this.extractResumeData(resumeText);
+      
+      console.log('Searching for real jobs with extracted data:', extractedData);
+      
+      // Use real job search service for actual LinkedIn job fetching
+      const realJobResults = await this.realJobSearch.searchJobsAlignedWithResume(
+        extractedData, 
+        options.maxResults || 5
+      );
+      
+      // Also get LinkedIn search URLs as backup
+      const searchUrls = this.jobSearch.generateJobSearchUrls(extractedData);
+      
+      return {
+        ...realJobResults,
+        searchUrls: searchUrls,
+        extractedData: extractedData
+      };
+    } catch (error) {
+      console.error('Error searching jobs:', error);
+      throw new Error(`Failed to search for jobs: ${error.message}`);
+    }
+  }
+
+  /**
+   * Extract structured data from resume text
+   * @param {string} resumeText - Full resume text
+   * @returns {Object} - Extracted resume data
+   */
+  extractResumeData(resumeText) {
+    const data = {
+      skills: [],
+      experience: '',
+      location: 'United States'
+    };
+
+    // Extract skills using patterns
+    const skillPatterns = [
+      /\b(JavaScript|Python|Java|React|Node\.?js|Angular|Vue\.?js|TypeScript)\b/gi,
+      /\b(HTML|CSS|SCSS|SASS|Bootstrap|Tailwind)\b/gi,
+      /\b(SQL|MongoDB|PostgreSQL|MySQL|Redis|Firebase)\b/gi,
+      /\b(AWS|Azure|Docker|Kubernetes|Git|Jenkins)\b/gi,
+      /\b(Machine Learning|AI|Data Science|Analytics|TensorFlow|PyTorch)\b/gi,
+      /\b(Express|Django|Flask|Spring|Laravel|Rails)\b/gi,
+      /\b(PHP|Ruby|Go|Rust|Swift|Kotlin|C\+\+|C#)\b/gi
+    ];
+
+    skillPatterns.forEach(pattern => {
+      const matches = resumeText.match(pattern);
+      if (matches) {
+        data.skills.push(...matches.map(match => match.trim()));
+      }
+    });
+
+    // Remove duplicates and clean up
+    data.skills = [...new Set(data.skills)].slice(0, 10);
+
+    // Extract experience (look for years of experience)
+    const experienceMatch = resumeText.match(/(\d+)\+?\s*years?\s*(?:of\s*)?experience/i);
+    if (experienceMatch) {
+      data.experience = experienceMatch[1];
+    }
+
+    // Extract location (look for common location patterns)
+    const locationMatch = resumeText.match(/(?:Location|Address|Based in)[:\s]*([^,\n]+(?:,\s*[A-Z]{2})?)/i);
+    if (locationMatch) {
+      data.location = locationMatch[1].trim();
+    }
+
+    return data;
+  }
+
+  /**
+   * Perform complete resume analysis with job search
+   * @param {string} resumeText - Full resume text
+   * @param {Object} options - Analysis options
+   * @returns {Promise<Object>} - Complete analysis results including job search
+   */
+  async performCompleteAnalysisWithJobs(resumeText, options = {}) {
+    try {
+      // Create chunks for analysis
+      const chunks = VectorService.createTextChunks(resumeText, 700, 200);
+      this.vectorService.addDocuments(chunks);
+
+      // Perform standard analysis
+      const [summary, strengths, weaknesses, jobTitles, professionalSummary, rating, jobSearch] = await Promise.all([
+        this.generateSummary(resumeText),
+        this.analyzeStrengths(resumeText),
+        this.analyzeWeaknesses(chunks),
+        this.suggestJobTitles(chunks),
+        this.generateProfessionalSummary(chunks),
+        this.rateResume(chunks),
+        this.searchJobs(resumeText, options)
+      ]);
+
+      return {
+        summary,
+        strengths,
+        weaknesses,
+        jobTitles,
+        professionalSummary,
+        rating,
+        jobSearch,
+        analyzedAt: new Date().toISOString()
+      };
+    } catch (error) {
+      console.error('Error performing complete analysis with jobs:', error);
+      throw new Error('Failed to complete resume analysis with job search');
+    }
+  }
+
+  /**
+   * Perform complete resume analysis (legacy method for compatibility)
    * @param {Array} chunks - Text chunks from resume
    * @returns {Promise<Object>} - Complete analysis results
    */
   async performCompleteAnalysis(chunks) {
     try {
+      console.log('Starting performCompleteAnalysis with', chunks.length, 'chunks');
+      
+      // Convert chunks to full text for vector service compatibility
+      const fullText = chunks.join('\n\n');
+      console.log('Full text length:', fullText.length);
+      
+      // Add documents to vector service
+      this.vectorService.addDocuments(chunks.map(chunk => chunk));
+      console.log('Added documents to vector service');
+
+      console.log('Starting parallel analysis...');
       const [summary, strengths, weaknesses, jobTitles, professionalSummary, rating] = await Promise.all([
-        this.generateSummary(chunks),
-        this.analyzeStrengths(chunks),
-        this.analyzeWeaknesses(chunks),
-        this.suggestJobTitles(chunks),
-        this.generateProfessionalSummary(chunks),
-        this.rateResume(chunks)
+        this.generateSummary(fullText).catch(err => {
+          console.error('Summary generation failed:', err);
+          throw new Error(`Summary generation failed: ${err.message}`);
+        }),
+        this.analyzeStrengths(fullText).catch(err => {
+          console.error('Strengths analysis failed:', err);
+          throw new Error(`Strengths analysis failed: ${err.message}`);
+        }),
+        this.analyzeWeaknesses(chunks).catch(err => {
+          console.error('Weaknesses analysis failed:', err);
+          throw new Error(`Weaknesses analysis failed: ${err.message}`);
+        }),
+        this.suggestJobTitles(chunks).catch(err => {
+          console.error('Job titles suggestion failed:', err);
+          throw new Error(`Job titles suggestion failed: ${err.message}`);
+        }),
+        this.generateProfessionalSummary(chunks).catch(err => {
+          console.error('Professional summary generation failed:', err);
+          throw new Error(`Professional summary generation failed: ${err.message}`);
+        }),
+        this.rateResume(chunks).catch(err => {
+          console.error('Resume rating failed:', err);
+          throw new Error(`Resume rating failed: ${err.message}`);
+        })
       ]);
+
+      console.log('All analysis components completed successfully');
 
       return {
         summary,
@@ -359,7 +552,7 @@ Be specific about technical requirements, years of experience, and industry know
       };
     } catch (error) {
       console.error('Error performing complete analysis:', error);
-      throw new Error('Failed to complete resume analysis');
+      throw new Error(`Failed to complete resume analysis: ${error.message}`);
     }
   }
 }

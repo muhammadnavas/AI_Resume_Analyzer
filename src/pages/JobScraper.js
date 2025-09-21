@@ -1,7 +1,7 @@
-import { Briefcase, Building, Clock, ExternalLink, MapPin, Search, AlertCircle, Download } from 'lucide-react';
+import { AlertCircle, Briefcase, Building, Clock, Download, ExternalLink, MapPin, Search } from 'lucide-react';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
-import { LinkedInScraperService } from '../services/linkedinScraper';
+import { RealJobSearchService } from '../services/realJobSearchService.js';
 
 const JobScraper = () => {
   const [searchData, setSearchData] = useState({
@@ -12,6 +12,10 @@ const JobScraper = () => {
   const [loading, setLoading] = useState(false);
   const [jobs, setJobs] = useState([]);
   const [error, setError] = useState('');
+  const [searchUrls, setSearchUrls] = useState([]);
+  const [jobSource, setJobSource] = useState('');
+  
+  const realJobSearchService = new RealJobSearchService();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,32 +49,52 @@ const JobScraper = () => {
         throw new Error('Please enter valid job titles');
       }
 
-      // Use LinkedIn scraper service
-      const scrapedJobs = await LinkedInScraperService.scrapeLinkedInJobs(
-        jobTitles,
-        searchData.location,
+      // Create resume data from search input
+      const resumeData = {
+        skills: jobTitles, // Use job titles as skills for searching
+        location: searchData.location,
+        experience: 3 // Default experience level
+      };
+
+      console.log('Searching for real jobs with data:', resumeData);
+
+      // Use real job search service for actual LinkedIn jobs
+      const jobResults = await realJobSearchService.searchJobsAlignedWithResume(
+        resumeData, 
         parseInt(searchData.count)
       );
 
-      if (scrapedJobs.length === 0) {
-        setError('No matching jobs found. Try different keywords or location.');
-        toast.error('No jobs found', { id: loadingToast });
-      } else {
-        // Transform scraped data to match UI expectations
-        const transformedJobs = scrapedJobs.map((job, index) => ({
-          id: index + 1,
-          title: job.title,
-          company: job.company,
-          location: job.location,
-          type: 'Full-time', // Default type
-          postedDate: 'Recently posted',
-          description: job.description || 'Description not available',
-          url: job.url
-        }));
-
-        setJobs(transformedJobs);
-        toast.success(`Found ${transformedJobs.length} jobs!`, { id: loadingToast });
+      if (!jobResults.success) {
+        throw new Error(jobResults.error || 'Job search failed');
       }
+
+      // Set job source info
+      setJobSource(jobResults.source || 'Unknown');
+
+      // Set search URLs if available
+      setSearchUrls(jobResults.searchUrls || []);
+
+      // Transform real job results for display
+      const transformedJobs = jobResults.jobs.map((job, index) => ({
+        id: index + 1,
+        title: job.title,
+        company: job.company,
+        location: job.location,
+        type: job.type || 'Full-time',
+        postedDate: job.postedDate || 'Recently posted',
+        description: job.description || job.relevanceReason || 'No description available',
+        url: job.url,
+        matchScore: job.matchScore || 0,
+        source: jobResults.source
+      }));
+
+      setJobs(transformedJobs);
+      
+      const successMessage = jobResults.source === 'LinkedIn (Real Data)' 
+        ? `Found ${transformedJobs.length} real LinkedIn jobs!`
+        : `Generated ${transformedJobs.length} job recommendations!`;
+        
+      toast.success(successMessage, { id: loadingToast });
 
     } catch (error) {
       console.error('Job search error:', error);
@@ -80,60 +104,63 @@ const JobScraper = () => {
       setLoading(false);
     }
   };
-        },
-        {
-          id: 2,
-          title: `Junior ${searchData.jobTitle}`,
-          company: 'Innovation Labs',
-          location: 'Mumbai, India',
-          type: 'Full-time',
-          postedDate: '1 week ago',
-          description: `Join our team as a ${searchData.jobTitle} and work on cutting-edge projects. We offer excellent growth opportunities and a collaborative work environment.`,
-          url: 'https://linkedin.com/jobs/example-2'
-        },
-        {
-          id: 3,
-          title: `Lead ${searchData.jobTitle}`,
-          company: 'Global Systems Ltd.',
-          location: 'Delhi, India',
-          type: 'Full-time',
-          postedDate: '3 days ago',
-          description: `We are seeking a lead ${searchData.jobTitle} to drive our technical initiatives and mentor junior team members.`,
-          url: 'https://linkedin.com/jobs/example-3'
-        }
-      ].slice(0, parseInt(searchData.count));
 
-      setJobs(mockJobs);
-      toast.success(`Found ${mockJobs.length} job(s)`, { id: loadingToast });
-      
-    } catch (error) {
-      console.error('Job search error:', error);
-      toast.error('Failed to search for jobs', { id: loadingToast });
-    } finally {
-      setLoading(false);
-    }
+  const downloadJobsReport = () => {
+    if (jobs.length === 0) return;
+
+    const report = `LINKEDIN JOBS REPORT
+Generated: ${new Date().toLocaleDateString()}
+Search Terms: ${searchData.jobTitle}
+Location: ${searchData.location}
+Total Jobs Found: ${jobs.length}
+
+${'='.repeat(80)}
+
+${jobs.map((job, index) => `
+JOB ${index + 1}:
+Company: ${job.company}
+Title: ${job.title}
+Location: ${job.location}
+URL: ${job.url}
+
+Description:
+${job.description}
+
+${'='.repeat(80)}
+`).join('\n')}
+
+---
+Generated by AI Resume Analyzer - GenAI Hackathon 2025
+    `;
+    
+    const blob = new Blob([report], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `linkedin-jobs-${Date.now()}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Jobs report downloaded!');
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Job Scraper</h1>
-          <p className="text-gray-600">
-            Search and discover job opportunities from LinkedIn based on your criteria
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            Real LinkedIn Job Search
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Find actual job listings from LinkedIn aligned with your skills and experience
           </p>
         </div>
 
-        {/* Search Form */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Search Jobs</h2>
-          
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
           <form onSubmit={handleSearch} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Job Title *
+                  Job Titles (comma-separated)
                 </label>
                 <div className="relative">
                   <Briefcase className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
@@ -142,13 +169,13 @@ const JobScraper = () => {
                     name="jobTitle"
                     value={searchData.jobTitle}
                     onChange={handleInputChange}
-                    placeholder="e.g., Software Engineer, Data Scientist"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g., Software Engineer, Data Scientist, Product Manager"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                     required
                   />
                 </div>
               </div>
-
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Location
@@ -160,12 +187,14 @@ const JobScraper = () => {
                     name="location"
                     value={searchData.location}
                     onChange={handleInputChange}
-                    placeholder="e.g., Bangalore, Mumbai, Delhi"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="e.g., India, Bangalore, Remote"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                   />
                 </div>
               </div>
+            </div>
 
+            <div className="flex items-center justify-between">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Number of Jobs
@@ -174,140 +203,173 @@ const JobScraper = () => {
                   name="count"
                   value={searchData.count}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 >
-                  <option value="5">5 jobs</option>
-                  <option value="10">10 jobs</option>
-                  <option value="15">15 jobs</option>
-                  <option value="20">20 jobs</option>
+                  <option value={5}>5 jobs</option>
+                  <option value={10}>10 jobs</option>
+                  <option value={15}>15 jobs</option>
+                  <option value={25}>25 jobs</option>
                 </select>
               </div>
-            </div>
 
-            <div className="flex justify-center">
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center space-x-2"
+                className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                <Search className="w-5 h-5" />
-                <span>{loading ? 'Searching...' : 'Search Jobs'}</span>
+                {loading ? (
+                  <>
+                    <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    Finding Jobs...
+                  </>
+                ) : (
+                  <>
+                    <Search className="w-5 h-5" />
+                    Find Jobs
+                  </>
+                )}
               </button>
             </div>
           </form>
         </div>
 
-        {/* Demo Notice */}
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
-          <div className="flex items-start space-x-3">
-            <div className="w-5 h-5 text-yellow-600 mt-0.5">⚠️</div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
             <div>
-              <h3 className="text-sm font-medium text-yellow-800 mb-1">Demo Mode</h3>
-              <p className="text-sm text-yellow-700">
-                This is a demonstration of the job scraper interface. In the full implementation, 
-                this would integrate with LinkedIn's job search using Selenium automation or LinkedIn's API 
-                to fetch real job postings based on your search criteria.
+              <h3 className="text-sm font-medium text-blue-800">
+                Smart Job Search
+              </h3>
+              <p className="text-sm text-blue-700 mt-1">
+                This feature generates LinkedIn search URLs and job recommendations based on your input. 
+                Click the generated links to browse actual job listings on LinkedIn. The system provides 
+                intelligent job matching with mock recommendations for demonstration purposes.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Loading State */}
-        {loading && (
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
-            <p className="text-gray-600">Searching for jobs on LinkedIn...</p>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+              <p className="text-red-800">{error}</p>
+            </div>
           </div>
         )}
 
-        {/* Job Results */}
-        {jobs.length > 0 && !loading && (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">
-                Found {jobs.length} job{jobs.length !== 1 ? 's' : ''}
-              </h2>
-              <p className="text-gray-600">
-                Showing results for "{searchData.jobTitle}" in {searchData.location}
-              </p>
-            </div>
-
-            {jobs.map((job) => (
-              <div key={job.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-200">
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">{job.title}</h3>
-                    <div className="flex items-center space-x-4 text-gray-600 mb-3">
-                      <div className="flex items-center space-x-1">
-                        <Building className="w-4 h-4" />
-                        <span>{job.company}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="w-4 h-4" />
-                        <span>{job.location}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{job.postedDate}</span>
-                      </div>
-                    </div>
-                    <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                      {job.type}
-                    </span>
+        {searchUrls.length > 0 && (
+          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <ExternalLink className="w-5 h-5" />
+              LinkedIn Search URLs
+            </h3>
+            <p className="text-gray-600 mb-4">
+              Click these links to browse actual LinkedIn job listings based on your search criteria:
+            </p>
+            <div className="space-y-3">
+              {searchUrls.map((urlData, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900">{urlData.skill}</p>
+                    <p className="text-sm text-gray-600">{urlData.description}</p>
                   </div>
                   <a
-                    href={job.url}
+                    href={urlData.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-700 transition-colors"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 text-sm"
                   >
-                    <span>View Job</span>
                     <ExternalLink className="w-4 h-4" />
+                    Search LinkedIn
                   </a>
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
 
-                <div className="border-t pt-4">
-                  <h4 className="font-medium text-gray-900 mb-2">Job Description</h4>
-                  <p className="text-gray-700 leading-relaxed">
-                    {job.description}
+        {jobs.length > 0 && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between bg-white rounded-lg p-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Found {jobs.length} Jobs
+                </h2>
+                {jobSource && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Source: <span className="font-medium text-blue-600">{jobSource}</span>
                   </p>
-                </div>
-
-                <div className="mt-4 flex justify-between items-center pt-4 border-t">
-                  <div className="text-sm text-gray-500">
-                    Posted {job.postedDate}
-                  </div>
-                  <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200">
-                    Apply Now
-                  </button>
-                </div>
+                )}
               </div>
-            ))}
+              <button
+                onClick={downloadJobsReport}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:ring-2 focus:ring-green-500 flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                Download Report
+              </button>
+            </div>
+
+            <div className="grid gap-6">
+              {jobs.map((job) => (
+                <div key={job.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-xl font-semibold text-gray-900">
+                          {job.title}
+                        </h3>
+                        {job.matchScore && (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
+                            {job.matchScore}% match
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-gray-600 mb-2">
+                        <div className="flex items-center gap-1">
+                          <Building className="w-4 h-4" />
+                          <span className="font-medium text-blue-600">{job.company}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          <span>{job.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <span>{job.postedDate}</span>
+                        </div>
+                      </div>
+                    </div>
+                    {job.url && (
+                      <a
+                        href={job.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center gap-2 text-sm whitespace-nowrap"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Job
+                      </a>
+                    )}
+                  </div>
+
+                  {job.description && job.description !== 'Description not available' && (
+                    <div className="border-t pt-4">
+                      <h4 className="font-medium text-gray-900 mb-2">Job Description:</h4>
+                      <div className="text-gray-700 text-sm leading-relaxed bg-gray-50 p-4 rounded-lg max-h-40 overflow-y-auto">
+                        {job.description.length > 500 
+                          ? `${job.description.substring(0, 500)}...` 
+                          : job.description
+                        }
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
-
-        {/* No Results */}
-        {jobs.length === 0 && !loading && searchData.jobTitle && (
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center">
-            <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs found</h3>
-            <p className="text-gray-600">
-              Try adjusting your search criteria or keywords
-            </p>
-          </div>
-        )}
-
-        {/* Implementation Note */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">Implementation Details</h3>
-          <div className="text-blue-800 space-y-2">
-            <p>• <strong>LinkedIn Integration:</strong> Uses Selenium WebDriver for automated job scraping</p>
-            <p>• <strong>Smart Filtering:</strong> Filters jobs based on relevance to search criteria</p>
-            <p>• <strong>Data Extraction:</strong> Captures company names, job titles, locations, and descriptions</p>
-            <p>• <strong>Rate Limiting:</strong> Implements proper delays to respect LinkedIn's usage policies</p>
-            <p>• <strong>Error Handling:</strong> Robust error handling for network issues and page changes</p>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -26,10 +26,7 @@
     "react-pdf": "^7.5.1",
     "pdfjs-dist": "^3.11.174",
     "ml-matrix": "^6.10.7",
-    "natural": "^6.12.0",
-    "compromise": "^14.10.0",
-    "puppeteer": "^21.5.2",
-    "node-nlp": "^4.27.0"
+    "compromise": "^14.10.0"
   },
   "devDependencies": {
     "eslint": "^8.56.0",

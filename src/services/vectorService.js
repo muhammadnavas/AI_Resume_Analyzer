@@ -1,83 +1,101 @@
-// Vector Service - Implements FAISS-like functionality for text similarity search
-import { Matrix } from 'ml-matrix';
-import natural from 'natural';
+// Vector Service - Browser-compatible FAISS-like functionality for text similarity search
 
 class VectorService {
   constructor() {
-    this.tfidf = new natural.TfIdf();
     this.documents = [];
     this.vectors = [];
     this.documentMetadata = [];
+    this.vocabulary = new Map();
+    this.idfCache = new Map();
+  }
+
+  // Simple tokenizer for browser compatibility
+  tokenize(text) {
+    return text
+      .toLowerCase()
+      .replace(/[^\w\s]/g, ' ')
+      .split(/\s+/)
+      .filter(token => token.length > 2);
+  }
+
+  // Calculate term frequency
+  calculateTF(tokens) {
+    const tf = new Map();
+    const totalTokens = tokens.length;
+    
+    for (const token of tokens) {
+      tf.set(token, (tf.get(token) || 0) + 1);
+    }
+    
+    // Normalize by total tokens
+    for (const [token, count] of tf.entries()) {
+      tf.set(token, count / totalTokens);
+    }
+    
+    return tf;
+  }
+
+  // Calculate inverse document frequency
+  calculateIDF(term) {
+    if (this.idfCache.has(term)) {
+      return this.idfCache.get(term);
+    }
+    
+    let docCount = 0;
+    for (const doc of this.documents) {
+      if (doc.toLowerCase().includes(term)) {
+        docCount++;
+      }
+    }
+    
+    const idf = Math.log(this.documents.length / (docCount + 1));
+    this.idfCache.set(term, idf);
+    return idf;
+  }
+
+  // Build vocabulary from all documents
+  buildVocabulary() {
+    const vocab = new Set();
+    
+    for (const doc of this.documents) {
+      const tokens = this.tokenize(doc);
+      for (const token of tokens) {
+        vocab.add(token);
+      }
+    }
+    
+    // Convert to Map with indices
+    let index = 0;
+    for (const term of vocab) {
+      this.vocabulary.set(term, index++);
+    }
+  }
+
+  // Create TF-IDF vector for a document
+  createTFIDFVector(text) {
+    const tokens = this.tokenize(text);
+    const tf = this.calculateTF(tokens);
+    const vector = new Array(this.vocabulary.size).fill(0);
+    
+    for (const [term, tfValue] of tf.entries()) {
+      if (this.vocabulary.has(term)) {
+        const index = this.vocabulary.get(term);
+        const idf = this.calculateIDF(term);
+        vector[index] = tfValue * idf;
+      }
+    }
+    
+    return vector;
   }
 
   // Add documents to the vector store (similar to FAISS.from_texts)
   addDocuments(textChunks, metadata = []) {
-    textChunks.forEach((chunk, index) => {
-      this.tfidf.addDocument(chunk);
-      this.documents.push(chunk);
-      this.documentMetadata.push(metadata[index] || { id: index, text: chunk });
-    });
+    this.documents = [...textChunks];
+    this.documentMetadata = metadata.length ? metadata : textChunks.map((text, id) => ({ id, text }));
     
-    // Build TF-IDF vectors
-    this.buildVectors();
-  }
-
-  // Build TF-IDF vectors for all documents
-  buildVectors() {
-    this.vectors = [];
-    const terms = this.getAllTerms();
-    
-    this.documents.forEach((doc, docIndex) => {
-      const vector = [];
-      terms.forEach(term => {
-        vector.push(this.tfidf.tfidf(term, docIndex));
-      });
-      this.vectors.push(vector);
-    });
-  }
-
-  // Get all unique terms across documents
-  getAllTerms() {
-    const allTerms = new Set();
-    this.tfidf.documents.forEach(doc => {
-      Object.keys(doc).forEach(term => allTerms.add(term));
-    });
-    return Array.from(allTerms);
-  }
-
-  // Similarity search (equivalent to vectorstore.similarity_search)
-  similaritySearch(query, k = 3) {
-    if (this.vectors.length === 0) {
-      return [];
-    }
-
-    // Create query vector
-    const queryTfidf = new natural.TfIdf();
-    queryTfidf.addDocument(query);
-    
-    const terms = this.getAllTerms();
-    const queryVector = [];
-    terms.forEach(term => {
-      queryVector.push(queryTfidf.tfidf(term, 0));
-    });
-
-    // Calculate cosine similarities
-    const similarities = this.vectors.map((docVector, index) => ({
-      index,
-      similarity: this.cosineSimilarity(queryVector, docVector),
-      document: this.documents[index],
-      metadata: this.documentMetadata[index]
-    }));
-
-    // Sort by similarity and return top k
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k)
-      .map(result => ({
-        pageContent: result.document,
-        metadata: result.metadata,
-        similarity: result.similarity
-      }));
+    // Build vocabulary and vectors
+    this.buildVocabulary();
+    this.vectors = this.documents.map(doc => this.createTFIDFVector(doc));
   }
 
   // Calculate cosine similarity between two vectors
@@ -106,18 +124,37 @@ class VectorService {
     return dotProduct / (normA * normB);
   }
 
+  // Similarity search (equivalent to vectorstore.similarity_search)
+  similaritySearch(query, k = 3) {
+    if (this.vectors.length === 0) {
+      return [];
+    }
+
+    // Create query vector
+    const queryVector = this.createTFIDFVector(query);
+
+    // Calculate similarities
+    const similarities = this.vectors.map((docVector, index) => ({
+      index,
+      similarity: this.cosineSimilarity(queryVector, docVector),
+      document: this.documents[index],
+      metadata: this.documentMetadata[index]
+    }));
+
+    // Sort by similarity and return top k
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k)
+      .map(result => ({
+        pageContent: result.document,
+        metadata: result.metadata,
+        similarity: result.similarity
+      }));
+  }
+
   // Get embedding-like representation for a text
   getTextEmbedding(text) {
-    const tempTfidf = new natural.TfIdf();
-    tempTfidf.addDocument(text);
-    
-    const terms = this.getAllTerms();
-    const vector = [];
-    terms.forEach(term => {
-      vector.push(tempTfidf.tfidf(term, 0));
-    });
-    
-    return vector;
+    return this.createTFIDFVector(text);
   }
 
   // Advanced text chunking similar to LangChain's RecursiveCharacterTextSplitter
@@ -194,17 +231,21 @@ class VectorService {
     const certKeywords = text.match(/\b(Certified|Certification|Certificate|AWS|Microsoft|Google|Oracle|Cisco)\b/gi) || [];
     features.certifications = certKeywords;
 
-    // Extract general keywords using TF-IDF
-    const tfidf = new natural.TfIdf();
-    tfidf.addDocument(text);
+    // Extract general keywords using simple frequency analysis
+    const words = text.toLowerCase().match(/\b[a-z]{3,}\b/g) || [];
+    const wordCount = new Map();
     
-    const termFreqs = [];
-    tfidf.listTerms(0).slice(0, 20).forEach(item => {
-      if (item.term.length > 3) {
-        termFreqs.push(item.term);
-      }
-    });
-    features.keywords = termFreqs;
+    for (const word of words) {
+      wordCount.set(word, (wordCount.get(word) || 0) + 1);
+    }
+    
+    // Get top keywords by frequency
+    const sortedWords = Array.from(wordCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 20)
+      .map(([word]) => word);
+    
+    features.keywords = sortedWords;
 
     return features;
   }
