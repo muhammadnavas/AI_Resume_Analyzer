@@ -1,84 +1,81 @@
-# AI Resume Analyzer - React Application
+# AI Resume Analyzer & Career Optimizer
 
-**GenAI-Powered Solutions: Hack The Matrix 2025**
+**Modern AI-Powered Resume Analysis with Google Gemini**
 
-Built for the GenAI Hackathon 2025, this is an advanced React-based AI application that leverages OpenAI's GPT-3.5 Turbo for comprehensive resume analysis. The application provides instant feedback, professional insights, job recommendations, and a sophisticated rating system to help job seekers optimize their resumes and accelerate their career growth.
-
-<br />
-
-**🚀 Live Demo**
-
-[Access the application here](#) - *Will be deployed after setup*
+This is an advanced React-based application that leverages Google Gemini AI for comprehensive resume analysis and career optimization. The application provides instant feedback, professional insights, job recommendations, and detailed scoring to help job seekers enhance their resumes and accelerate career growth.
 
 <br />
 
 **Table of Contents**
 
-1. [Key Technologies and Skills](#key-technologies-and-skills)
+1. [Key Technologies](#key-technologies)
 2. [Features](#features)
 3. [Installation](#installation)
 4. [Usage](#usage)
-5. [API Integration](#api-integration)
+5. [API Configuration](#api-configuration)
 6. [Project Structure](#project-structure)
 7. [Contributing](#contributing)
 8. [License](#license)
-9. [Contact](#contact)
 
 <br />
 
-## **Key Technologies and Skills**
+## **Key Technologies**
 
-### Frontend Technologies
+### Frontend Stack
 - **React 18** - Modern React with hooks and functional components
-- **JavaScript ES6+** - Latest JavaScript features and async/await
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **React Router** - Client-side routing for single page application
-- **Framer Motion** - Smooth animations and transitions
+- **JavaScript ES6+** - Latest JavaScript features and async/await patterns
+- **Tailwind CSS** - Utility-first CSS framework with custom glassmorphism effects
+- **React Router** - Client-side routing for seamless navigation
+- **Lucide React** - Modern SVG icon library
 
-### AI & PDF Processing
-- **OpenAI GPT-3.5 Turbo** - Advanced language model for resume analysis
-- **PDF.js (pdfjs-dist)** - Client-side PDF text extraction
-- **React Dropzone** - File upload with drag & drop functionality
+### AI & Document Processing
+- **Google Gemini 1.5 Flash** - Advanced language model for resume analysis
+- **PDF.js (pdfjs-dist)** - Client-side PDF text extraction and processing
+- **Mammoth.js** - DOCX document processing for Word files
+- **React Dropzone** - Drag & drop file upload with validation
 
 ### Additional Libraries
-- **React Hot Toast** - Beautiful toast notifications
-- **Lucide React** - Modern icon library
-- **Axios** - HTTP client for API requests
+- **React Hot Toast** - Beautiful notification system
+- **Custom Vector Service** - Browser-compatible text similarity search
 
 <br />
 
 ## **Features**
 
-### 🎯 **Advanced Resume Analysis**
-- **Smart PDF Processing**: Extracts text from PDF resumes with metadata analysis
-- **AI-Powered Insights**: Uses OpenAI GPT-3.5 Turbo for comprehensive analysis
-- **Rating System**: Provides detailed scoring (1-10) across multiple criteria:
-  - Content Quality
-  - Skills Presentation  
+### 🎯 **Comprehensive Resume Analysis**
+- **Multi-format Support**: Processes both PDF and DOCX resume files
+- **AI-Powered Insights**: Uses Google Gemini for intelligent analysis
+- **Professional Rating System**: Detailed 10-point scoring across:
+  - Content Quality & Clarity
+  - Structure & Organization
+  - Visual Formatting & Design
+  - Achievement Impact & Quantification
+  - ATS Compatibility & Optimization  
   - Experience Description
   - Achievement Highlights
   - Education & Certifications
   - Overall Professional Impact
 
-### 📊 **Comprehensive Feedback**
-- **Professional Summary**: AI-generated 2-3 sentence summary for resume top
-- **Strengths Analysis**: Identifies key strengths with supporting examples
-- **Improvement Suggestions**: Constructive feedback on areas for enhancement
-- **Job Title Recommendations**: 8-10 suitable job titles based on background
-- **Resume Rating**: Overall score with detailed breakdown
+### 📊 **Intelligent Analysis Features**
+- **Professional Summary Generation**: AI-crafted summary optimized for ATS systems
+- **Strength Identification**: Highlights key professional strengths with examples
+- **Improvement Recommendations**: Actionable feedback for resume enhancement
+- **Job Title Suggestions**: Career-appropriate position recommendations
+- **Detailed Scoring**: Comprehensive breakdown with grade classification
 
-### 💼 **Job Search Integration**
-- **LinkedIn Job Scraper**: Automated job discovery (demo interface ready)
-- **Smart Filtering**: Jobs matched to candidate profile
-- **Company Information**: Comprehensive job posting details
-- **Application Tracking**: Direct links to job applications
+### 💼 **Career Optimization Tools**
+- **LinkedIn Job Scraper**: Automated job discovery and matching (demo available)
+- **Skills Gap Analysis**: Identifies missing skills for target positions
+- **Industry Insights**: Current market trends and requirements
+- **ATS Optimization**: Ensures resume passes applicant tracking systems
 
 ### 🎨 **Modern User Experience**
-- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
-- **Drag & Drop Upload**: Intuitive file upload with validation
-- **Real-time Processing**: Live progress indicators during analysis
-- **Interactive Results**: Tabbed interface for easy navigation
-- **Export Functionality**: Download complete analysis reports
+- **Responsive Design**: Optimized for all devices and screen sizes
+- **Drag & Drop Interface**: Intuitive file upload with instant validation
+- **Progress Indicators**: Real-time feedback during document processing
+- **Tabbed Navigation**: Organized results in easily accessible sections
+- **Export Functionality**: Download complete analysis as text reports
+- **Status Indicators**: Visual feedback for API connectivity and file upload
 
 <br />
 
@@ -87,24 +84,11 @@ Built for the GenAI Hackathon 2025, this is an advanced React-based AI applicati
 ### Prerequisites
 - **Node.js** (version 16 or higher)
 - **npm** (comes with Node.js)
-- **OpenAI API Key** (get from [OpenAI Platform](https://platform.openai.com/))
+- **Google Gemini API Key** (get from [Google AI Studio](https://makersuite.google.com/))
 
 ### Quick Setup
 
-#### Windows Users:
-```bash
-# Run the automated setup script
-setup.bat
-```
-
-#### Mac/Linux Users:
-```bash
-# Make the script executable and run
-chmod +x setup.sh
-./setup.sh
-```
-
-### Manual Installation:
+#### Manual Installation:
 
 1. **Clone the repository:**
 ```bash

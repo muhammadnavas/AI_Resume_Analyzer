@@ -1,92 +1,14 @@
-import React, { useState, useEffect } from 'react';
 import {
     ArrowRight,
-    Award,
     BarChart3,
     FileText,
     Search,
-    Star,
     Target,
-    TrendingUp,
-    Users,
-    Zap,
-    RefreshCw
+    Zap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { RAGService } from '../services/ragService';
 
 const Dashboard = () => {
-  const [stats, setStats] = useState([]);
-  const [isLoadingStats, setIsLoadingStats] = useState(true);
-  const [ragService, setRagService] = useState(null);
-
-  // Initialize RAG Service
-  useEffect(() => {
-    const initializeRAG = async () => {
-      try {
-        // Get API key from localStorage or environment
-        const apiKey = localStorage.getItem('geminiApiKey') || process.env.REACT_APP_GEMINI_API_KEY;
-        if (apiKey) {
-          const rag = new RAGService(apiKey);
-          setRagService(rag);
-          await loadDynamicStats(rag);
-        } else {
-          // Fallback to default stats if no API key
-          setStats(getDefaultStats());
-          setIsLoadingStats(false);
-        }
-      } catch (error) {
-        console.error('Error initializing RAG service:', error);
-        setStats(getDefaultStats());
-        setIsLoadingStats(false);
-      }
-    };
-
-    initializeRAG();
-  }, []);
-
-  const loadDynamicStats = async (ragServiceInstance) => {
-    try {
-      setIsLoadingStats(true);
-      const dynamicStats = await ragServiceInstance.generateDashboardStats();
-      
-      // Map icons correctly
-      const statsWithIcons = dynamicStats.map(stat => ({
-        ...stat,
-        icon: getIconComponent(stat.icon)
-      }));
-      
-      setStats(statsWithIcons);
-    } catch (error) {
-      console.error('Error loading dynamic stats:', error);
-      setStats(getDefaultStats());
-    } finally {
-      setIsLoadingStats(false);
-    }
-  };
-
-  const getIconComponent = (iconName) => {
-    const iconMap = {
-      'users': Users,
-      'award': Award,
-      'trending-up': TrendingUp,
-      'star': Star
-    };
-    return iconMap[iconName] || Users;
-  };
-
-  const getDefaultStats = () => [
-    { icon: Users, label: 'Resumes Analyzed', value: '500+' },
-    { icon: Award, label: 'Success Rate', value: '89%' },
-    { icon: TrendingUp, label: 'Career Growth', value: '35%' },
-    { icon: Star, label: 'User Rating', value: '4.7/5' }
-  ];
-
-  const refreshStats = async () => {
-    if (ragService) {
-      await loadDynamicStats(ragService);
-    }
-  };
   const features = [
     {
       icon: FileText,
@@ -102,13 +24,6 @@ const Dashboard = () => {
       link: '/scraper',
       color: 'from-green-500 to-teal-600'
     }
-  ];
-
-  const stats = [
-    { icon: Users, label: 'Resumes Analyzed', value: '1000+' },
-    { icon: Award, label: 'Success Rate', value: '95%' },
-    { icon: TrendingUp, label: 'Career Growth', value: '40%' },
-    { icon: Star, label: 'User Rating', value: '4.9/5' }
   ];
 
   const benefits = [
@@ -141,11 +56,11 @@ const Dashboard = () => {
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
               AI-Powered Resume
               <span className="block bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent">
-                Analyzer
+                Analyzer & Career Optimizer
               </span>
             </h1>
             <p className="text-lg md:text-xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Transform your career with GenAI-powered resume analysis. Get instant feedback, 
+              Transform your career with AI-powered resume analysis using Google Gemini. Get instant feedback, 
               professional insights, and job recommendations to boost your hiring success.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
@@ -163,23 +78,6 @@ const Dashboard = () => {
                 Find Jobs
               </Link>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Section */}
-      <div className="bg-white/90 backdrop-blur-md py-12 border-b border-gray-200/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center group">
-                <div className="mx-auto w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-3 shadow-lg group-hover:shadow-xl transform group-hover:scale-110 transition-all duration-300">
-                  <stat.icon className="w-7 h-7 text-white" />
-                </div>
-                <div className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                <div className="text-xs text-gray-600 font-medium">{stat.label}</div>
-              </div>
-            ))}
           </div>
         </div>
       </div>
@@ -273,19 +171,6 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-gray-400 text-sm">
-              © 2025 AI Resume Analyzer - GenAI Hackathon Project
-            </p>
-            <p className="text-gray-500 text-xs mt-1">
-              Built with React, Google Gemini, and advanced PDF processing
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };
