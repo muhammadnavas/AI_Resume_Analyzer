@@ -1,81 +1,170 @@
 # AI Resume Analyzer & Career Optimizer
 
-**Modern AI-Powered Resume Analysis with Google Gemini**
+**Intelligent Resume Analysis with Google Gemini AI**
 
-This is an advanced React-based application that leverages Google Gemini AI for comprehensive resume analysis and career optimization. The application provides instant feedback, professional insights, job recommendations, and detailed scoring to help job seekers enhance their resumes and accelerate career growth.
+A modern React-based application that provides comprehensive resume analysis using Google Gemini AI. The application processes PDF and DOCX resumes to deliver detailed insights, scoring, and career recommendations with a beautiful, responsive interface.
 
 <br />
 
 **Table of Contents**
 
-1. [Key Technologies](#key-technologies)
-2. [Features](#features)
+1. [Features](#features)
+2. [Technology Stack](#technology-stack)
 3. [Installation](#installation)
 4. [Usage](#usage)
-5. [API Configuration](#api-configuration)
-6. [Project Structure](#project-structure)
+5. [Project Structure](#project-structure)
+6. [API Configuration](#api-configuration)
 7. [Contributing](#contributing)
 8. [License](#license)
 
 <br />
 
-## **Key Technologies**
+## **Features**
 
-### Frontend Stack
-- **React 18** - Modern React with hooks and functional components
-- **JavaScript ES6+** - Latest JavaScript features and async/await patterns
-- **Tailwind CSS** - Utility-first CSS framework with custom glassmorphism effects
-- **React Router** - Client-side routing for seamless navigation
-- **Lucide React** - Modern SVG icon library
+### 🎯 **Resume Analysis Engine**
+- **Multi-format Processing**: Supports PDF and DOCX file uploads
+- **Google Gemini Integration**: Advanced AI analysis using Gemini 1.5 Flash
+- **Comprehensive Scoring**: 10-point rating system across 5 key criteria:
+  - Content Quality & Clarity
+  - Structure & Organization  
+  - Visual Formatting & Design
+  - Achievement Impact & Quantification
+  - ATS Compatibility & Optimization
 
-### AI & Document Processing
-- **Google Gemini 1.5 Flash** - Advanced language model for resume analysis
-- **PDF.js (pdfjs-dist)** - Client-side PDF text extraction and processing
-- **Mammoth.js** - DOCX document processing for Word files
-- **React Dropzone** - Drag & drop file upload with validation
+### 📊 **Detailed Insights**
+- **Professional Summary Generation**: AI-crafted summaries optimized for ATS
+- **Strengths Analysis**: Identifies key advantages with supporting examples
+- **Improvement Recommendations**: Actionable feedback for resume enhancement
+- **Job Title Suggestions**: Career-appropriate position recommendations
+- **Grade Classification**: Professional grading from A+ to F based on overall score
 
-### Additional Libraries
-- **React Hot Toast** - Beautiful notification system
-- **Custom Vector Service** - Browser-compatible text similarity search
+### 💼 **Job Search Integration**
+- **Job Scraper Demo**: Mock job search interface with sample data
+- **LinkedIn-style Results**: Professional job listing presentation
+- **Industry Insights**: Career market information and trends
+
+### 🎨 **Modern User Experience**
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **Drag & Drop Upload**: Intuitive file handling with instant validation
+- **Real-time Processing**: Live progress indicators during analysis
+- **Tabbed Interface**: Organized results in easily navigable sections
+- **Export Functionality**: Download complete analysis as formatted text reports
+- **Status Indicators**: Visual feedback for API connectivity and file processing
 
 <br />
 
-## **Features**
+## **Technology Stack**
 
-### 🎯 **Comprehensive Resume Analysis**
-- **Multi-format Support**: Processes both PDF and DOCX resume files
-- **AI-Powered Insights**: Uses Google Gemini for intelligent analysis
-- **Professional Rating System**: Detailed 10-point scoring across:
-  - Content Quality & Clarity
-  - Structure & Organization
-  - Visual Formatting & Design
-  - Achievement Impact & Quantification
-  - ATS Compatibility & Optimization  
-  - Experience Description
-  - Achievement Highlights
-  - Education & Certifications
-  - Overall Professional Impact
+### **Frontend Framework**
+- **React 18** - Modern functional components with hooks
+- **JavaScript ES6+** - Latest JavaScript features and async/await patterns
+- **React Router 6** - Client-side routing and navigation
 
-### 📊 **Intelligent Analysis Features**
-- **Professional Summary Generation**: AI-crafted summary optimized for ATS systems
-- **Strength Identification**: Highlights key professional strengths with examples
-- **Improvement Recommendations**: Actionable feedback for resume enhancement
-- **Job Title Suggestions**: Career-appropriate position recommendations
-- **Detailed Scoring**: Comprehensive breakdown with grade classification
+### **UI & Styling**
+- **Tailwind CSS 3** - Utility-first CSS with custom design system
+- **Lucide React** - Modern SVG icon library
+- **Glassmorphism Effects** - Modern UI with backdrop blur effects
+- **Responsive Design** - Mobile-first approach with breakpoint optimization
 
-### 💼 **Career Optimization Tools**
-- **LinkedIn Job Scraper**: Automated job discovery and matching (demo available)
-- **Skills Gap Analysis**: Identifies missing skills for target positions
-- **Industry Insights**: Current market trends and requirements
-- **ATS Optimization**: Ensures resume passes applicant tracking systems
+### **AI & Document Processing**
+- **Google Generative AI (@google/generative-ai)** - Gemini 1.5 Flash model integration
+- **PDF.js (pdfjs-dist)** - Client-side PDF text extraction
+- **Mammoth.js** - Microsoft Word (.docx) document processing
+- **Custom Vector Service** - Text similarity search and analysis
 
-### 🎨 **Modern User Experience**
-- **Responsive Design**: Optimized for all devices and screen sizes
-- **Drag & Drop Interface**: Intuitive file upload with instant validation
-- **Progress Indicators**: Real-time feedback during document processing
-- **Tabbed Navigation**: Organized results in easily accessible sections
-- **Export Functionality**: Download complete analysis as text reports
-- **Status Indicators**: Visual feedback for API connectivity and file upload
+### **File Handling & Validation**
+- **React Dropzone** - Drag and drop file upload with validation
+- **Custom Document Processor** - Unified PDF/DOCX processing pipeline
+- **File Type Detection** - Automatic format recognition and validation
+
+### **State Management & Context**
+- **React Context API** - Global state for API key management
+- **React Hooks** - Modern state management patterns
+- **Local Storage** - Secure API key persistence
+
+### **User Experience**
+- **React Hot Toast** - Beautiful notification system
+- **Progress Indicators** - Real-time feedback during processing
+- **Error Handling** - Comprehensive error management and user feedback
+
+<br />
+
+## **Installation**
+
+### **Prerequisites**
+- **Node.js** (version 16 or higher)
+- **npm** (comes with Node.js)
+- **Google Gemini API Key** ([Get from Google AI Studio](https://makersuite.google.com/))
+
+### **Setup Instructions**
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/your-username/AI-Resume-Analyzer.git
+cd AI-Resume-Analyzer
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Start the development server:**
+```bash
+npm start
+```
+
+4. **Open your browser:**
+Navigate to `http://localhost:3000`
+
+<br />
+
+## **Usage**
+
+### **Getting Started**
+
+1. **Launch Application**
+   - Run `npm start` and navigate to `http://localhost:3000`
+   - The application opens with a modern dashboard interface
+
+2. **Configure Google Gemini API**
+   - Navigate to "Resume Analyzer" section
+   - Enter your Google Gemini API key when prompted
+   - Key is securely stored in browser's local storage
+
+3. **Upload Resume**
+   - Use drag & drop or click to browse files
+   - Supported formats: PDF and DOCX (max 10MB)
+   - Real-time validation with progress indicators
+
+4. **Get AI Analysis**
+   - Click "Analyze Resume" to start processing
+   - View comprehensive results across multiple tabs:
+     - **Summary**: Overall resume evaluation and key insights
+     - **Strengths**: Professional advantages and standout features
+     - **Improvements**: Specific enhancement recommendations
+     - **Job Suggestions**: AI-matched career opportunities
+     - **Rating**: Detailed scoring breakdown with grade
+
+5. **Export Results**
+   - Download complete analysis as formatted text report
+   - Use insights to optimize resume for ATS systems
+   - Track improvement progress over multiple analyses
+
+### **Advanced Features**
+
+#### **Professional Rating System**
+- **Content Quality (1-10)**: Information relevance, clarity, and professional impact
+- **Structure & Organization (1-10)**: Logical flow and section organization
+- **Visual Formatting (1-10)**: Design consistency and presentation quality
+- **Achievement Impact (1-10)**: Quantified accomplishments and measurable results
+- **ATS Compatibility (1-10)**: Keyword optimization and system compatibility
+
+#### **AI-Generated Insights**
+- **Professional Summary**: Compelling 2-3 sentence career overview
+- **Strength Analysis**: Data-driven identification of competitive advantages
+- **Improvement Roadmap**: Prioritized enhancement recommendations
+- **Career Positioning**: Strategic advice for job market positioning
 
 <br />
 
@@ -241,54 +330,3 @@ src/
 - Visual feedback for user interactions
 
 <br />
-
-## **Development**
-
-### Available Scripts
-
-- `npm start` - Start development server
-- `npm build` - Create production build  
-- `npm test` - Run test suite
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
-
-### Environment Variables
-
-```bash
-# .env file configuration
-REACT_APP_OPENAI_API_ENDPOINT=https://api.openai.com/v1
-REACT_APP_VERSION=1.0.0
-REACT_APP_MAX_FILE_SIZE=10485760
-GENERATE_SOURCEMAP=false
-```
-
-### Building for Production
-
-```bash
-npm run build
-```
-
-This creates an optimized production build in the `build/` directory.
-
-<br />
-
-**Contributing**
-
-Contributions to this project are welcome! If you encounter any issues or have suggestions for improvements, please feel free to submit a pull request.
-
-<br />
-
-**License**
-
-This project is licensed under the MIT License. Please review the LICENSE file for more details.
-
-<br />
-
-**Contact**
-
-📧 Email: gopiashokankiot@gmail.com 
-
-🌐 LinkedIn: [linkedin.com/in/gopiashokan](https://www.linkedin.com/in/gopiashokan)
-
-For any further questions or inquiries, feel free to reach out. We are happy to assist you with any queries.
-
