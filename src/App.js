@@ -15,20 +15,34 @@ function App() {
   return (
     <ApiKeyProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-100">
           <Toaster 
             position="top-right"
             toastOptions={{
               duration: 4000,
               style: {
-                background: '#363636',
+                background: '#1f2937',
                 color: '#fff',
+                borderRadius: '12px',
+                border: '1px solid #374151',
+                fontSize: '14px',
+                fontWeight: '500',
+                padding: '16px',
               },
               success: {
                 duration: 3000,
-                theme: {
-                  primary: 'green',
-                  secondary: 'black',
+                style: {
+                  background: 'linear-gradient(135deg, #10b981 0%, #047857 100%)',
+                },
+              },
+              error: {
+                style: {
+                  background: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                },
+              },
+              loading: {
+                style: {
+                  background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
                 },
               },
             }}
@@ -45,12 +59,14 @@ function App() {
               setSidebarOpen={setSidebarOpen} 
             />
             
-            <main className="flex-1 overflow-y-auto p-6 lg:ml-64">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/analyzer" element={<ResumeAnalyzer />} />
-                <Route path="/scraper" element={<JobScraper />} />
-              </Routes>
+            <main className="flex-1 overflow-y-auto lg:ml-64">
+              <div className="p-6 lg:p-8">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/analyzer" element={<ResumeAnalyzer />} />
+                  <Route path="/scraper" element={<JobScraper />} />
+                </Routes>
+              </div>
             </main>
           </div>
         </div>

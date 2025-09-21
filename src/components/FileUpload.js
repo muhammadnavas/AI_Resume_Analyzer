@@ -58,37 +58,37 @@ const FileUpload = ({ onFileSelect, isProcessing = false, accept = '.pdf' }) => 
   if (uploadedFile) {
     return (
       <div className="w-full">
-        <div className="border-2 border-green-300 bg-green-50 rounded-lg p-6">
+        <div className="border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-green-600" />
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <FileText className="w-6 h-6 text-white" />
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-900">{uploadedFile.name}</p>
-                <p className="text-xs text-gray-500">{formatFileSize(uploadedFile.size)}</p>
+                <p className="text-sm font-semibold text-gray-900">{uploadedFile.name}</p>
+                <p className="text-xs text-gray-600 font-medium">{formatFileSize(uploadedFile.size)}</p>
               </div>
             </div>
             
             {!isProcessing && (
               <button
                 onClick={removeFile}
-                className="p-1 rounded-full hover:bg-gray-200 transition-colors duration-200"
+                className="p-2 rounded-xl hover:bg-red-100 transition-all duration-200 transform hover:scale-105"
                 title="Remove file"
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="w-5 h-5 text-red-500" />
               </button>
             )}
           </div>
           
           {isProcessing && (
-            <div className="mt-4">
-              <div className="flex items-center space-x-2 text-blue-600">
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
-                <span className="text-sm">Processing your resume...</span>
+            <div className="mt-6">
+              <div className="flex items-center space-x-3 text-blue-700 mb-3">
+                <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+                <span className="text-sm font-medium">Processing your resume...</span>
               </div>
-              <div className="mt-2 bg-blue-200 rounded-full h-2">
-                <div className="bg-blue-600 h-2 rounded-full animate-pulse" style={{ width: '60%' }}></div>
+              <div className="bg-blue-200 rounded-full h-3 overflow-hidden">
+                <div className="bg-gradient-to-r from-blue-500 to-purple-600 h-full rounded-full animate-pulse shadow-inner" style={{ width: '60%' }}></div>
               </div>
             </div>
           )}
@@ -102,44 +102,48 @@ const FileUpload = ({ onFileSelect, isProcessing = false, accept = '.pdf' }) => 
       <div
         {...getRootProps()}
         className={`
-          border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all duration-200
+          border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all duration-300 transform hover:scale-105
           ${isDragActive || dragActive 
-            ? 'border-blue-500 bg-blue-50' 
-            : 'border-gray-300 hover:border-blue-400 hover:bg-gray-50'
+            ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 shadow-xl' 
+            : 'border-gray-300 hover:border-blue-400 hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50 shadow-lg hover:shadow-xl'
           }
           ${isProcessing ? 'opacity-50 cursor-not-allowed' : ''}
         `}
       >
         <input {...getInputProps()} />
         
-        <div className="space-y-4">
-          <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-            <Upload className={`w-6 h-6 ${isDragActive ? 'text-blue-500' : 'text-gray-400'}`} />
+        <div className="space-y-6">
+          <div className={`mx-auto w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+            isDragActive ? 'bg-gradient-to-br from-blue-500 to-purple-600 scale-110' : 'bg-gradient-to-br from-gray-100 to-gray-200'
+          }`}>
+            <Upload className={`w-8 h-8 ${isDragActive ? 'text-white' : 'text-gray-400'}`} />
           </div>
           
           <div>
-            <p className="text-lg font-medium text-gray-900">
+            <p className="text-xl font-semibold text-gray-900 mb-2">
               {isDragActive ? 'Drop your resume here' : 'Upload your resume'}
             </p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-600 font-medium">
               Drag and drop your PDF file here, or click to browse
             </p>
           </div>
           
-          <div className="text-xs text-gray-400">
-            <p>Supported format: PDF only</p>
+          <div className="text-xs text-gray-500 space-y-1">
+            <p className="font-medium">Supported format: PDF only</p>
             <p>Maximum file size: 10MB</p>
           </div>
         </div>
       </div>
       
       {/* Help text */}
-      <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-        <div className="flex items-start space-x-2">
-          <AlertCircle className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div className="text-xs text-blue-700">
-            <p className="font-medium">Tips for best results:</p>
-            <ul className="mt-1 space-y-1 list-disc list-inside">
+      <div className="mt-6 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200/50 shadow-lg">
+        <div className="flex items-start space-x-3">
+          <div className="w-6 h-6 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+            <AlertCircle className="w-4 h-4 text-white" />
+          </div>
+          <div className="text-sm text-blue-700">
+            <p className="font-semibold mb-2">Tips for best results:</p>
+            <ul className="space-y-1 list-disc list-inside text-xs leading-relaxed">
               <li>Use a clear, well-formatted PDF resume</li>
               <li>Ensure text is selectable (not scanned images)</li>
               <li>Include all relevant sections: skills, experience, education</li>

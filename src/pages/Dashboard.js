@@ -56,32 +56,35 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-blue-600/20 bg-[length:60px_60px] bg-[radial-gradient(circle,rgba(255,255,255,0.1)_2px,transparent_2px)]"></div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
               AI-Powered Resume
-              <span className="block gradient-text bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">
+              <span className="block bg-gradient-to-r from-yellow-300 via-orange-300 to-pink-300 bg-clip-text text-transparent">
                 Analyzer
               </span>
             </h1>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 max-w-4xl mx-auto leading-relaxed">
               Transform your career with GenAI-powered resume analysis. Get instant feedback, 
               professional insights, and job recommendations to boost your hiring success.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <Link
                 to="/analyzer"
-                className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 transition-colors duration-200"
+                className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-semibold rounded-2xl text-white bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl"
               >
                 Analyze Resume
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
                 to="/scraper"
-                className="inline-flex items-center px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-white hover:text-gray-900 transition-colors duration-200"
+                className="inline-flex items-center px-8 py-4 border-2 border-white text-lg font-semibold rounded-2xl text-white hover:bg-white hover:text-gray-900 transition-all duration-300 transform hover:scale-105 backdrop-blur-sm bg-white/10"
               >
                 Find Jobs
               </Link>
@@ -91,16 +94,16 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Section */}
-      <div className="bg-white py-16">
+      <div className="bg-white/90 backdrop-blur-md py-16 border-b border-gray-200/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="mx-auto w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <stat.icon className="w-6 h-6 text-blue-600" />
+              <div key={index} className="text-center group">
+                <div className="mx-auto w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg group-hover:shadow-xl transform group-hover:scale-110 transition-all duration-300">
+                  <stat.icon className="w-8 h-8 text-white" />
                 </div>
-                <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
-                <div className="text-sm text-gray-600">{stat.label}</div>
+                <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
+                <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>

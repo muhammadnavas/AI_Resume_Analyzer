@@ -1,5 +1,4 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { LinkedInJobSearch } from './linkedinJobSearch.js';
 import { RealJobSearchService } from './realJobSearchService.js';
 import { VectorService } from './vectorService.js';
 
@@ -17,7 +16,6 @@ export class ResumeAnalyzer {
       }
     });
     this.vectorService = new VectorService();
-    this.jobSearch = new LinkedInJobSearch();
     this.realJobSearch = new RealJobSearchService();
   }
 
@@ -393,8 +391,8 @@ Be specific about technical requirements, years of experience, and industry know
         options.maxResults || 5
       );
       
-      // Also get LinkedIn search URLs as backup
-      const searchUrls = this.jobSearch.generateJobSearchUrls(extractedData);
+      // Also get LinkedIn search URLs as backup using real job search service
+      const searchUrls = this.realJobSearch.generateJobSearchUrls(extractedData);
       
       return {
         ...realJobResults,

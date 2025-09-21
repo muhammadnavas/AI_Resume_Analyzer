@@ -426,6 +426,83 @@ class RealJobSearchService {
       };
     }
   }
+
+  // Generate LinkedIn search URLs for manual browsing
+  generateJobSearchUrls(resumeData) {
+    const { skills, experience, location } = resumeData;
+    
+    const urls = [];
+    
+    // Primary skill-based searches
+    if (skills && skills.length > 0) {
+      const topSkills = skills.slice(0, 3);
+      topSkills.forEach(skill => {
+        const url = this.buildLinkedInSearchUrlWithParams({
+          keywords: skill,
+          location: location || 'United States',
+          experience: this.mapExperienceLevel(experience)
+        });
+        urls.push({
+          skill,
+          url,
+          description: `Jobs requiring ${skill}`
+        });
+      });
+    }
+
+    // Combined skills search
+    if (skills && skills.length > 1) {
+      const combinedSkills = skills.slice(0, 3).join(' ');
+      const url = this.buildLinkedInSearchUrlWithParams({
+        keywords: combinedSkills,
+        location: location || 'United States',
+        experience: this.mapExperienceLevel(experience)
+      });
+      urls.push({
+        skill: 'Combined Skills',
+        url,
+        description: `Jobs matching multiple skills: ${skills.slice(0, 3).join(', ')}`
+      });
+    }
+
+    return urls;
+  }
+
+  // Build LinkedIn search URL with additional parameters
+  buildLinkedInSearchUrlWithParams(params) {
+    const searchParams = new URLSearchParams();
+    
+    if (params.keywords) {
+      searchParams.append('keywords', params.keywords);
+    }
+    if (params.location) {
+      searchParams.append('location', params.location);
+    }
+    if (params.experience) {
+      searchParams.append('f_E', params.experience);
+    }
+    
+    // Add some default filters for better results
+    searchParams.append('f_TPR', 'r86400'); // Posted in last 24 hours
+    searchParams.append('f_JT', 'F'); // Full-time jobs
+    
+    return `${this.linkedinBaseUrl}?${searchParams.toString()}`;
+  }
+
+  // Map experience to LinkedIn experience level codes
+  mapExperienceLevel(experience) {
+    if (!experience) return '2'; // Mid-level default
+    
+    const yearsMatch = experience.toString().match(/(\d+)/);
+    if (!yearsMatch) return '2';
+    
+    const years = parseInt(yearsMatch[1]);
+    
+    if (years <= 2) return '1'; // Entry level
+    if (years <= 5) return '2'; // Associate
+    if (years <= 10) return '3'; // Mid-Senior
+    return '4'; // Director+
+  }
 }
 
 export { RealJobSearchService };

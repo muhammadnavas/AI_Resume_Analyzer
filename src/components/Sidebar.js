@@ -34,16 +34,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 lg:z-auto
+        fixed inset-y-0 left-0 z-30 w-64 bg-white/95 backdrop-blur-md shadow-2xl transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 lg:z-auto border-r border-gray-200/50
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         <div className="flex flex-col h-full pt-16">
           {/* Close button for mobile */}
-          <div className="flex items-center justify-between p-4 lg:hidden">
+          <div className="flex items-center justify-between p-4 lg:hidden border-b border-gray-200/50">
             <h2 className="text-lg font-semibold text-gray-900">Navigation</h2>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+              className="p-2 rounded-xl text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 transition-all duration-200 hover:scale-105"
             >
               <X size={20} />
             </button>
@@ -52,25 +52,25 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
           {/* Navigation */}
           <nav className="flex-1 px-4 pb-4 space-y-2">
             <div className="mb-6">
-              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                 Main Navigation
               </h3>
-              <div className="mt-2 space-y-1">
+              <div className="space-y-1">
                 {navigation.map((item) => (
                   <NavLink
                     key={item.name}
                     to={item.href}
                     className={({ isActive }) =>
-                      `group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      `group flex items-center px-3 py-3 text-sm font-medium rounded-xl transition-all duration-200 ${
                         isActive
-                          ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 hover:scale-105'
                       }`
                     }
                     onClick={() => setSidebarOpen(false)}
                   >
                     <item.icon 
-                      className={`mr-3 h-5 w-5 transition-colors duration-200`}
+                      className={`mr-3 h-5 w-5 transition-all duration-200`}
                     />
                     {item.name}
                   </NavLink>
@@ -80,16 +80,16 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
             {/* Features section */}
             <div className="mb-6">
-              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+              <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">
                 Features
               </h3>
-              <div className="mt-2 space-y-1">
+              <div className="space-y-1">
                 {features.map((item) => (
                   <div
                     key={item.name}
-                    className="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md"
+                    className="group flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-xl hover:bg-gray-100/80 transition-all duration-200 cursor-pointer"
                   >
-                    <item.icon className="mr-3 h-5 w-5 text-gray-400" />
+                    <item.icon className="mr-3 h-5 w-5 text-gray-400 group-hover:text-gray-600 transition-colors duration-200" />
                     {item.name}
                   </div>
                 ))}
@@ -97,16 +97,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
             </div>
 
             {/* Info card */}
-            <div className="mt-auto p-4">
-              <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg p-4 text-white">
-                <h4 className="text-sm font-semibold mb-2">
-                  GenAI Hackathon 2025
-                </h4>
-                <p className="text-xs opacity-90">
-                  Advanced resume analysis with AI-powered insights for better career opportunities.
-                </p>
-              </div>
-            </div>
+            
           </nav>
         </div>
       </div>
