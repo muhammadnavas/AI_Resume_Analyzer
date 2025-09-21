@@ -5,7 +5,7 @@ const Header = ({ sidebarOpen, setSidebarOpen }) => {
   const { isApiKeyValid, clearApiKey } = useApiKey();
 
   return (
-    <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200/60 z-30">
+    <header className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md shadow-lg border-b border-gray-200/60 z-40">
       <div className="flex items-center justify-between h-16 px-4 lg:px-6">
         {/* Left side - Menu button and Logo */}
         <div className="flex items-center">
