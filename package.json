@@ -1,8 +1,8 @@
 {
-  "name": "ai-resume-analyzer-react",
+  "name": "ai-resume-analyzer",
   "version": "1.0.0",
   "private": true,
-  "description": "Advanced AI-Powered Resume Analyzer built with React and JavaScript",
+  "description": "AI-Powered Resume Analyzer",
   "dependencies": {
     "@google/generative-ai": "^0.2.1",
     "@headlessui/react": "^1.7.17",
