@@ -640,49 +640,45 @@ const FormattedContent = ({ content }) => {
           )}
           <div className="text-gray-700 space-y-3">
             {section.content.map((paragraph, pIndex) => {
-              // Clean up paragraph text
-              const cleanParagraph = paragraph.replace(/\*\*(.*?)\*\*/g, '$1').trim();
+              const cleanParagraph = paragraph.trim();
               
-              // Check if paragraph looks like a bullet point or sub-item
-              const isBulletPoint = cleanParagraph.startsWith('-') || 
-                                  cleanParagraph.startsWith('•') || 
-                                  cleanParagraph.match(/^[0-9]+\./);
+              // Check if paragraph is a bullet point
+              const bulletMatch = cleanParagraph.match(/^[-•*]|\d+\.\s/);
+              const isBulletPoint = bulletMatch !== null;
               
-              // Split long paragraphs into bullet points if they contain multiple sentences
-              const sentences = cleanParagraph.split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 0);
-              
+              // Function to render text with bolding
+              const renderWithBold = (text) => {
+                // Split by the bold markdown, keeping the captured group
+                const parts = text.split(/(\*\*.*?\*\*)/g).filter(part => part);
+                return parts.map((part, i) =>
+                  part.startsWith('**') && part.endsWith('**')
+                    ? <strong key={i}>{part.slice(2, -2)}</strong>
+                    : part
+                );
+              };
+
               if (isBulletPoint) {
+                const bulletContent = cleanParagraph
+                  .replace(/^[-•*]\s*/, '')
+                  .replace(/^\d+\.\s*/, '');
+
                 return (
-                  <div key={pIndex} className="flex items-start space-x-3 bg-white/60 rounded-xl p-4 border border-white/50 hover:bg-white/80 transition-all duration-200">
+                  <div key={pIndex} className="flex items-start space-x-3 bg-white/60 rounded-xl p-4 border border-white/50 hover:bg-white/80 transition-all duration-200 text-gray-800">
                     <span className="text-blue-500 mt-1 flex-shrink-0 text-lg font-bold">•</span>
-                    <p className="leading-relaxed text-sm flex-1 text-gray-800">
-                      {cleanParagraph.replace(/^[-•]\s*/, '').replace(/^[0-9]+\.\s*/, '')}
+                    <p className="leading-relaxed text-base flex-1">
+                      {renderWithBold(bulletContent)}
                     </p>
                   </div>
                 );
               }
               
-              // If it's a long paragraph with multiple sentences, break it into bullet points
-              if (sentences.length > 2 && cleanParagraph.length > 150) {
-                return (
-                  <div key={pIndex} className="space-y-2">
-                    {sentences.map((sentence, sIndex) => (
-                      <div key={sIndex} className="flex items-start space-x-3 bg-white/60 rounded-xl p-4 border border-white/50 hover:bg-white/80 transition-all duration-200">
-                        <span className="text-blue-500 mt-1 flex-shrink-0 text-lg font-bold">•</span>
-                        <p className="leading-relaxed text-sm flex-1 text-gray-800">
-                          {sentence.trim()}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                );
-              }
-              
               // Regular paragraph with enhanced styling
+              if (cleanParagraph.length === 0) return null;
+
               return (
-                <div key={pIndex} className="bg-white/60 rounded-xl p-4 border border-white/50 hover:bg-white/80 transition-all duration-200">
-                  <p className="leading-relaxed text-sm text-gray-800 font-medium">
-                    {cleanParagraph}
+                <div key={pIndex} className="bg-white/60 rounded-xl p-4 border border-white/50 hover:bg-white/80 transition-all duration-200 text-gray-800">
+                  <p className="leading-relaxed text-base font-medium">
+                    {renderWithBold(cleanParagraph)}
                   </p>
                 </div>
               );
