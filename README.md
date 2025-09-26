@@ -172,20 +172,54 @@ Navigate to `http://localhost:3000`
 
 ### **Google Gemini Setup**
 
+#### **Method 1: Environment Variables (Recommended)**
+
 1. **Get API Key:**
-   - Visit [Google AI Studio](https://makersuite.google.com/)
+   - Visit [Google AI Studio](https://ai.google.dev/)
    - Sign in with your Google account
    - Create a new API key for Gemini 1.5 Flash
 
-2. **Configure in Application:**
+2. **Configure Environment:**
+   - Copy `.env.example` to `.env` in the project root:
+   ```bash
+   cp .env.example .env
+   ```
+   - Edit `.env` and add your API key:
+   ```env
+   REACT_APP_GEMINI_API_KEY=your_actual_api_key_here
+   ```
+   - Restart the development server:
+   ```bash
+   npm start
+   ```
+
+3. **Security Benefits:**
+   - ✅ API key is not stored in browser local storage
+   - ✅ Not committed to version control (protected by .gitignore)
+   - ✅ More secure for production deployments
+   - ✅ Centralized configuration management
+
+#### **Method 2: Local Storage Fallback**
+
+If environment variables are not available, the application supports local storage fallback:
+
+1. **Enable Fallback Mode:**
+   - Set `REACT_APP_ENABLE_LOCAL_STORAGE_FALLBACK=true` in `.env`
+
+2. **Configure via UI:**
    - Navigate to Resume Analyzer page
    - Enter API key in the configuration field
    - Key is securely stored in browser's local storage
 
-3. **Usage Notes:**
-   - Free tier includes generous quotas for testing
-   - Rate limiting is handled automatically by the application
-   - API key is only stored locally in your browser
+#### **Configuration Priority**
+1. **Environment Variables** (highest priority)
+2. **Local Storage** (fallback, if enabled)
+3. **Manual Entry** (temporary session only)
+
+#### **Usage Notes:**
+- Free tier includes generous quotas for testing
+- Rate limiting is handled automatically by the application
+- Environment variables are the recommended approach for security
 
 <br />
 
